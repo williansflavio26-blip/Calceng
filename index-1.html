@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CalcEng — Calculadoras de Engenharia</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0e1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CalcEng">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  min-height: 100vh;
+  background: #0a0e1a;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px;
+  font-family: 'Syne', sans-serif;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(249,115,22,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(0,212,255,0.04) 0%, transparent 60%),
+    repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(255,255,255,0.01) 50px, rgba(255,255,255,0.01) 51px),
+    repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(255,255,255,0.01) 50px, rgba(255,255,255,0.01) 51px);
+}
+.logo { font-size: 3rem; font-weight: 800; color: #f97316; letter-spacing: -1px; margin-bottom: 6px; animation: fadeDown .6s ease both; }
+.logo span { color: #e6edf3; }
+.sub { color: #8b949e; font-family: 'JetBrains Mono', monospace; font-size: 0.74rem; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 52px; animation: fadeDown .6s .1s ease both; }
+.cards { display: flex; flex-direction: column; gap: 16px; width: 100%; max-width: 440px; }
+.card {
+  background: #161b22; border: 1px solid #30363d; border-radius: 18px;
+  padding: 24px 22px; cursor: pointer; transition: all .25s cubic-bezier(.4,0,.2,1);
+  display: flex; align-items: center; gap: 18px;
+  text-decoration: none; animation: fadeUp .5s ease both;
+}
+.card:nth-child(1){animation-delay:.15s} .card:nth-child(2){animation-delay:.25s} .card:nth-child(3){animation-delay:.35s}
+.card:hover { border-color: var(--c); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,.5), 0 0 0 1px var(--c); background: #1c2230; }
+.icon { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); transition: background .25s; }
+.card:hover .icon { background: rgba(255,255,255,.09); }
+.info h2 { font-size: 1.15rem; font-weight: 700; color: #e6edf3; margin-bottom: 4px; }
+.info p { font-size: 0.78rem; color: #8b949e; font-family: 'Lato', sans-serif; line-height: 1.5; }
+.arr { margin-left: auto; color: #30363d; font-size: 1.6rem; flex-shrink: 0; transition: all .25s; }
+.card:hover .arr { color: var(--c); transform: translateX(4px); }
+.footer { margin-top: 44px; color: #30363d; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 1.5px; animation: fadeUp .5s .5s ease both; }
+@keyframes fadeDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeUp   { from{opacity:0;transform:translateY(16px)}  to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+<div class="logo">CALC<span>ENG</span></div>
+<div class="sub">Calculadoras de Engenharia</div>
+<div class="cards">
+  <a class="card" href="vigacalc.html" style="--c:#f97316">
+    <div class="icon">🏗</div>
+    <div class="info"><h2>VigaCalc</h2><p>Reações de apoio em vigas isostáticas — Pino, Rolete, Engaste</p></div>
+    <div class="arr">›</div>
+  </a>
+  <a class="card" href="eletrica.html" style="--c:#00d4ff">
+    <div class="icon">⚡</div>
+    <div class="info"><h2>Calculadora Elétrica</h2><p>Lei de Ohm, Resistores, Dimensionamento, Motores e Quiz</p></div>
+    <div class="arr">›</div>
+  </a>
+  <a class="card" href="nbr5410-1.html" style="--c:#ff6b00">
+    <div class="icon">📐</div>
+    <div class="info"><h2>NBR 5410</h2><p>Dimensionamento Elétrico — Cabos, Disjuntores, Condutos e Quadros</p></div>
+    <div class="arr">›</div>
+  </a>
+</div>
+<div class="footer">ENGENHARIA CIVIL &amp; ELÉTRICA · v3.0</div>
+<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js");</script>
+</body>
+</html>
