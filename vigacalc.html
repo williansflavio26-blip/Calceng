@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VigaCalc — CalcEng</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d1117">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.btn-back {
+  position: fixed; top: 14px; left: 14px; z-index: 9999;
+  background: rgba(10,14,26,0.92); border: 1px solid #30363d; border-radius: 50px;
+  color: #e6edf3; font-family: 'Syne', sans-serif; font-size: 0.8rem; font-weight: 700;
+  padding: 8px 16px 8px 12px; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  backdrop-filter: blur(8px); transition: all .2s; text-decoration: none;
+}
+.btn-back:hover { border-color: #f97316; color: #f97316; }
+#app-vigas { display: block !important; min-height: 100vh; }
+</style>
+<style>
+
+#app-vigas {
+  --bg:       #0d1117;
+  --surface:  #161b22;
+  --surface2: #1e2530;
+  --border:   #30363d;
+  --accent:   #f97316;
+  --accent2:  #fb923c;
+  --blue:     #38bdf8;
+  --green:    #4ade80;
+  --red:      #f87171;
+  --yellow:   #fbbf24;
+  --text:     #e6edf3;
+  --muted:    #8b949e;
+  --radius:   10px;
+  font-family: 'Lato', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+#app-vigas * { box-sizing: border-box; margin: 0; padding: 0; }
+#app-vigas header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 32px 18px 120px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(12px);
+}
+#app-vigas .logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: #f97316;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+#app-vigas .logo span { color: var(--text); }
+#app-vigas header p {
+  color: var(--muted);
+  font-size: 0.82rem;
+  border-left: 2px solid var(--border);
+  padding-left: 20px;
+}
+#app-vigas .badge {
+  margin-left: auto;
+  background: rgba(249,115,22,0.15);
+  color: #f97316;
+  border: 1px solid rgba(249,115,22,0.3);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+}
+#app-vigas .app {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  min-height: calc(100vh - 61px);
+}
+#app-vigas .panel-left {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+#app-vigas .section-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #f97316;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#app-vigas .section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+#app-vigas .card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+#app-vigas label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+#app-vigas input[type=number],
+#app-vigas input[type=text],
+#app-vigas select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 9px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color .2s;
+  appearance: auto;
+}
+#app-vigas input:focus, #app-vigas select:focus { border-color: #f97316; }
+#app-vigas .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+#app-vigas .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+#app-vigas .btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 7px; padding: 9px 16px; border: none; border-radius: 7px;
+  font-family: 'Syne', sans-serif; font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; transition: all .18s; letter-spacing: 0.3px;
+}
+#app-vigas .btn-primary {
+  background: #f97316; color: #fff; width: 100%; padding: 12px; font-size: 0.95rem;
+}
+#app-vigas .btn-primary:hover { background: #fb923c; transform: translateY(-1px); }
+#app-vigas .btn-outline {
+  background: transparent; border: 1px solid var(--border); color: var(--muted);
+}
+#app-vigas .btn-outline:hover { border-color: #f97316; color: #f97316; }
+#app-vigas .btn-danger {
+  background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3);
+  color: #f87171; padding: 6px 10px; font-size: 0.75rem;
+}
+#app-vigas .btn-danger:hover { background: rgba(248,113,113,0.25); }
+#app-vigas .btn-add {
+  background: rgba(74,222,128,0.1); border: 1px dashed rgba(74,222,128,0.4);
+  color: #4ade80; width: 100%; padding: 8px; font-size: 0.8rem;
+}
+#app-vigas .btn-add:hover { background: rgba(74,222,128,0.2); }
+#app-vigas .btn-example {
+  background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25);
+  color: #38bdf8; font-size: 0.78rem; padding: 7px 12px;
+}
+#app-vigas .btn-example:hover { background: rgba(56,189,248,0.2); }
+#app-vigas .item-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+#app-vigas .item-row {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  padding: 10px 12px; display: flex; align-items: center; gap: 10px;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  animation: vgSlideIn .2s ease;
+}
+@keyframes vgSlideIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
+#app-vigas .item-row .tag {
+  background: rgba(249,115,22,0.15); color: #f97316;
+  padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
+}
+#app-vigas .item-row .tag.blue  { background: rgba(56,189,248,0.15); color: #38bdf8; }
+#app-vigas .item-row .tag.green { background: rgba(74,222,128,0.15); color: #4ade80; }
+#app-vigas .item-row .tag.yel   { background: rgba(251,191,36,0.15);  color: #fbbf24; }
+#app-vigas .item-row span { flex: 1; color: var(--muted); }
+#app-vigas .item-row .val { color: var(--text); font-weight: 500; }
+#app-vigas .examples-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#app-vigas .panel-right { padding: 28px 32px; overflow-y: auto; display: flex; flex-direction: column; gap: 28px; }
+#app-vigas .canvas-wrapper {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px;
+}
+#app-vigas .canvas-title {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
+  color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px;
+}
+#app-vigas canvas { width: 100%; border-radius: 6px; display: block; }
+#app-vigas #resultado { display: none; flex-direction: column; gap: 20px; animation: vgFadeUp .4s ease; }
+@keyframes vgFadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+#app-vigas .result-header {
+  background: linear-gradient(135deg, rgba(249,115,22,0.12), rgba(249,115,22,0.04));
+  border: 1px solid rgba(249,115,22,0.25); border-radius: var(--radius); padding: 20px 24px;
+  display: flex; align-items: center; gap: 16px;
+}
+#app-vigas .result-header .icon {
+  width: 48px; height: 48px; background: #f97316; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0;
+}
+#app-vigas .result-header h2 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; }
+#app-vigas .result-header p { color: var(--muted); font-size: 0.85rem; margin-top: 3px; }
+#app-vigas .reactions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+#app-vigas .reaction-card {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px; text-align: center; transition: border-color .2s;
+}
+#app-vigas .reaction-card:hover { border-color: #f97316; }
+#app-vigas .reaction-card .rc-label { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
+#app-vigas .reaction-card .rc-value { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; color: #f97316; }
+#app-vigas .reaction-card .rc-unit { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+#app-vigas .reaction-card .rc-dir { font-size: 1.2rem; margin-top: 4px; }
+#app-vigas .steps-container { display: flex; flex-direction: column; gap: 14px; }
+#app-vigas .step { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+#app-vigas .step-header {
+  padding: 14px 18px; display: flex; align-items: center; gap: 14px;
+  cursor: pointer; user-select: none; transition: background .15s;
+}
+#app-vigas .step-header:hover { background: rgba(255,255,255,0.03); }
+#app-vigas .step-num {
+  width: 30px; height: 30px; border-radius: 50%; background: #f97316; color: #fff;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+#app-vigas .step-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem; flex: 1; }
+#app-vigas .step-toggle { color: var(--muted); font-size: 1rem; transition: transform .2s; }
+#app-vigas .step.open .step-toggle { transform: rotate(180deg); }
+#app-vigas .step-body { display: none; padding: 0 18px 18px; border-top: 1px solid var(--border); }
+#app-vigas .step.open .step-body { display: block; }
+#app-vigas .eq-block {
+  background: var(--bg); border-left: 3px solid #f97316; border-radius: 0 6px 6px 0;
+  padding: 14px 16px; margin: 12px 0; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; line-height: 1.8;
+}
+#app-vigas .eq-block .eq-line { color: var(--text); }
+#app-vigas .eq-block .eq-result { color: #f97316; font-weight: 700; font-size: 0.95rem; }
+#app-vigas .eq-block .eq-comment { color: var(--muted); font-size: 0.78rem; font-style: italic; }
+#app-vigas .contrib-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; margin: 12px 0; }
+#app-vigas .contrib-table th { background: var(--bg); color: var(--muted); padding: 8px 10px; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); }
+#app-vigas .contrib-table td { padding: 8px 10px; border-bottom: 1px solid rgba(48,54,61,0.5); color: var(--text); }
+#app-vigas .contrib-table tr:last-child td { border-bottom: none; color: #f97316; font-weight: 700; }
+#app-vigas .contrib-table .pos { color: #4ade80; }
+#app-vigas .contrib-table .neg { color: #f87171; }
+#app-vigas .check-row {
+  display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 6px; margin: 6px 0;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.83rem;
+}
+#app-vigas .check-row.ok  { background: rgba(74,222,128,0.08);  border: 1px solid rgba(74,222,128,0.2); }
+#app-vigas .check-row.err { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); }
+#app-vigas .check-icon { font-size: 1.1rem; flex-shrink: 0; }
+#app-vigas .check-label { flex: 1; color: var(--muted); }
+#app-vigas .check-val { color: var(--text); font-weight: 700; }
+#app-vigas .error-box {
+  background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3);
+  border-radius: var(--radius); padding: 16px 20px; color: #f87171; font-size: 0.9rem; display: none;
+}
+#app-vigas .empty-state {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; color: var(--muted); text-align: center; padding: 60px 20px;
+}
+#app-vigas .empty-state .big { font-size: 3rem; }
+#app-vigas .empty-state h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; color: var(--text); margin-top: 8px; }
+#app-vigas .empty-state p { font-size: 0.88rem; max-width: 320px; line-height: 1.6; }
+#app-vigas .mt8 { margin-top: 8px; }
+#app-vigas .mt12 { margin-top: 12px; }
+#app-vigas .gap8 { display: flex; gap: 8px; flex-wrap: wrap; }
+#app-vigas .info-chip {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+  background: rgba(56,189,248,0.1); color: #38bdf8; border: 1px solid rgba(56,189,248,0.2);
+  padding: 3px 8px; border-radius: 4px;
+}
+@media (max-width: 900px) {
+  #app-vigas .app { grid-template-columns: 1fr; }
+  #app-vigas .panel-left { border-right: none; border-bottom: 1px solid var(--border); }
+}
+
+</style>
+</head>
+<body>
+<a class="btn-back" href="index.html">← Menu</a>
+<!-- ══════════════ APP VIGAS ══════════════ -->
+<div id="app-vigas" class="active">
+  <header>
+    <div class="logo">VIGA<span>CALC</span></div>
+    <p>Calculadora de Reações de Apoio — Vigas Isostáticas</p>
+    <div class="badge">ENG. CIVIL</div>
+  </header>
+
+  <div class="app">
+    <aside class="panel-left">
+      <div>
+        <div class="section-label">Identificação</div>
+        <div class="card">
+          <label>Nome / Código da Viga</label>
+          <input type="text" id="vigaNome" value="Viga 1" placeholder="ex: Exercício 3">
+          <div class="mt12 row2">
+            <div>
+              <label>Comprimento L (m)</label>
+              <input type="number" id="vigaL" value="5" step="0.5" min="0.1">
+            </div>
+            <div>
+              <label>Tipo de Apoio</label>
+              <select id="vigaTipo">
+                <option value="sa">Pino + Rolete</option>
+                <option value="eng">Engaste</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="apoiosSection">
+        <div class="section-label">Apoios</div>
+        <div class="card" id="apoiosCard"></div>
+      </div>
+
+      <div>
+        <div class="section-label">Cargas Concentradas</div>
+        <div class="card">
+          <div class="row3">
+            <div>
+              <label>Posição (m)</label>
+              <input type="number" id="ccPos" step="0.5" placeholder="x">
+            </div>
+            <div>
+              <label>Valor (kN)</label>
+              <input type="number" id="ccVal" step="10" placeholder="↓+">
+            </div>
+            <div style="display:flex;align-items:flex-end;">
+              <button class="btn btn-add" onclick="addCC()" style="padding:9px 10px;">+ Add</button>
+            </div>
+          </div>
+          <div class="item-list" id="ccList"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Cargas Distribuídas</div>
+        <div class="card">
+          <div class="row2">
+            <div><label>De x (m)</label><input type="number" id="cdXi" step="0.5" placeholder="início"></div>
+            <div><label>Até x (m)</label><input type="number" id="cdXf" step="0.5" placeholder="fim"></div>
+          </div>
+          <div class="row2 mt8">
+            <div><label>w início (kN/m)</label><input type="number" id="cdWi" step="10" placeholder="↓+"></div>
+            <div><label>w fim (kN/m)</label><input type="number" id="cdWf" step="10" placeholder="= início se uniforme"></div>
+          </div>
+          <button class="btn btn-add mt8" onclick="addCD()">+ Adicionar Carga Distribuída</button>
+          <div class="item-list" id="cdList"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Momentos Externos</div>
+        <div class="card">
+          <div class="row2">
+            <div><label>Posição (m)</label><input type="number" id="mePos" step="0.5" placeholder="x"></div>
+            <div><label>Valor (kN·m)</label><input type="number" id="meVal" step="10" placeholder="↺ +"></div>
+          </div>
+          <button class="btn btn-add mt8" onclick="addME()">+ Adicionar Momento</button>
+          <div class="item-list" id="meList"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Exemplos Rápidos</div>
+        <div class="examples-grid">
+          <button class="btn btn-example" onclick="loadEx(1)">📐 Ex.1 — 150 kN</button>
+          <button class="btn btn-example" onclick="loadEx(2)">🔩 Ex.2 — Engaste</button>
+          <button class="btn btn-example" onclick="loadEx(3)">📊 Ex.3 — Dist+Bal.</button>
+          <button class="btn btn-example" onclick="loadEx(4)">⚖️ Ex.4 — Balanço</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="calcular()">⚡ CALCULAR REAÇÕES</button>
+      <button class="btn btn-outline" onclick="resetar()">🗑 Limpar tudo</button>
+    </aside>
+
+    <main class="panel-right">
+      <div class="canvas-wrapper">
+        <div class="canvas-title">📐 Diagrama da Viga</div>
+        <canvas id="vigaCanvas" height="180"></canvas>
+      </div>
+      <div class="error-box" id="errorBox"></div>
+      <div class="empty-state" id="emptyState">
+        <div class="big">🏗</div>
+        <h3>Pronto para calcular</h3>
+        <p>Configure os apoios e carregamentos no painel à esquerda, depois clique em <strong>Calcular Reações</strong>.</p>
+      </div>
+      <div id="resultado">
+        <div class="result-header">
+          <div class="icon">✅</div>
+          <div>
+            <h2 id="resNome">Viga 1</h2>
+            <p id="resDesc">Viga simplesmente apoiada</p>
+          </div>
+        </div>
+        <div>
+          <div class="section-label">Reações de Apoio</div>
+          <div class="reactions-grid" id="reactionsGrid"></div>
+        </div>
+        <div>
+          <div class="section-label">Resolução Detalhada — Passo a Passo</div>
+          <div class="steps-container" id="stepsContainer"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  renderApoiosCard();
+  desenharViga();
+});
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('vigaTipo').addEventListener('change', renderApoiosCard);
+  document.getElementById('vigaL').addEventListener('input', desenharViga);
+  window.addEventListener('resize', desenharViga);
+});
+const state = { cc: [], cd: [], me: [] };
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderApoiosCard();
+});
+
+document.getElementById('vigaTipo').addEventListener('change', renderApoiosCard);
+document.getElementById('vigaL').addEventListener('input', desenharViga);
+window.addEventListener('resize', desenharViga);
+
+function renderApoiosCard() {
+  const tipo = document.getElementById('vigaTipo').value;
+  const L    = parseFloat(document.getElementById('vigaL').value) || 5;
+  const card = document.getElementById('apoiosCard');
+  if (tipo === 'eng') {
+    card.innerHTML = `<label>Posição do Engaste (m)</label>
+      <input type="number" id="apEngX" value="0" step="0.5">
+      <p class="mt8" style="font-size:0.78rem;color:var(--muted)">▐ Engaste = 3 reações: R<sub>A</sub> vertical, H<sub>A</sub> horizontal, M<sub>A</sub> momento</p>`;
+  } else {
+    card.innerHTML = `<div class="row2">
+      <div><label>Pino A — posição (m)</label><input type="number" id="apPinoX" value="0" step="0.5"></div>
+      <div><label>Rolete B — posição (m)</label><input type="number" id="apRoleteX" value="${L}" step="0.5"></div>
+      </div>
+      <p class="mt8" style="font-size:0.78rem;color:var(--muted)">△ Pino = R<sub>x</sub> + R<sub>y</sub> &nbsp;|&nbsp; ▽ Rolete = R<sub>y</sub></p>`;
+  }
+  desenharViga();
+}
+
+function addCC() {
+  const pos = parseFloat(document.getElementById('ccPos').value);
+  const val = parseFloat(document.getElementById('ccVal').value);
+  if (isNaN(pos)||isNaN(val)) return alert('Preencha posição e valor da carga.');
+  state.cc.push({pos, val});
+  document.getElementById('ccPos').value = '';
+  document.getElementById('ccVal').value = '';
+  renderLists(); desenharViga();
+}
+function addCD() {
+  const xi=parseFloat(document.getElementById('cdXi').value);
+  const xf=parseFloat(document.getElementById('cdXf').value);
+  const wi=parseFloat(document.getElementById('cdWi').value);
+  const wfRaw=document.getElementById('cdWf').value;
+  const wf=wfRaw===''?wi:parseFloat(wfRaw);
+  if(isNaN(xi)||isNaN(xf)||isNaN(wi)) return alert('Preencha os campos da carga distribuída.');
+  if(xf<=xi) return alert('x fim deve ser maior que x início.');
+  state.cd.push({xi,xf,wi,wf});
+  ['cdXi','cdXf','cdWi','cdWf'].forEach(id=>document.getElementById(id).value='');
+  renderLists(); desenharViga();
+}
+function addME() {
+  const pos=parseFloat(document.getElementById('mePos').value);
+  const val=parseFloat(document.getElementById('meVal').value);
+  if(isNaN(pos)||isNaN(val)) return alert('Preencha posição e valor do momento.');
+  state.me.push({pos,val});
+  document.getElementById('mePos').value='';
+  document.getElementById('meVal').value='';
+  renderLists(); desenharViga();
+}
+function removeCC(i){state.cc.splice(i,1);renderLists();desenharViga();}
+function removeCD(i){state.cd.splice(i,1);renderLists();desenharViga();}
+function removeME(i){state.me.splice(i,1);renderLists();desenharViga();}
+
+function renderLists() {
+  document.getElementById('ccList').innerHTML=state.cc.map((c,i)=>`
+    <div class="item-row"><span class="tag">F</span><span class="val">x=${c.pos}m</span>
+    <span>${c.val>=0?'↓':'↑'} ${Math.abs(c.val)} kN</span>
+    <button class="btn btn-danger" onclick="removeCC(${i})">✕</button></div>`).join('');
+  document.getElementById('cdList').innerHTML=state.cd.map((c,i)=>`
+    <div class="item-row"><span class="tag blue">q</span><span class="val">${c.xi}→${c.xf}m</span>
+    <span>${c.wi==c.wf?c.wi+' kN/m':c.wi+'→'+c.wf+' kN/m'}</span>
+    <button class="btn btn-danger" onclick="removeCD(${i})">✕</button></div>`).join('');
+  document.getElementById('meList').innerHTML=state.me.map((m,i)=>`
+    <div class="item-row"><span class="tag yel">M</span><span class="val">x=${m.pos}m</span>
+    <span>${m.val>=0?'↺':'↻'} ${Math.abs(m.val)} kN·m</span>
+    <button class="btn btn-danger" onclick="removeME(${i})">✕</button></div>`).join('');
+}
+
+function desenharViga() {
+  const canvas=document.getElementById('vigaCanvas');
+  if(!canvas) return;
+  const W=canvas.parentElement.clientWidth-48;
+  canvas.width=W; canvas.height=180;
+  const ctx=canvas.getContext('2d');
+  const L=parseFloat(document.getElementById('vigaL').value)||5;
+  const tipo=document.getElementById('vigaTipo').value;
+  const PAD=60, beamY=100, beamW=W-PAD*2;
+  function px(x){return PAD+(x/L)*beamW;}
+  ctx.clearRect(0,0,W,180);
+  ctx.strokeStyle='rgba(48,54,61,0.4)'; ctx.lineWidth=1;
+  for(let xi=PAD;xi<=W-PAD;xi+=beamW/10){ctx.beginPath();ctx.moveTo(xi,20);ctx.lineTo(xi,160);ctx.stroke();}
+  state.cd.forEach(cd=>{
+    const x1=px(cd.xi),x2=px(cd.xf);
+    ctx.fillStyle='rgba(56,189,248,0.08)'; ctx.fillRect(x1,40,x2-x1,beamY-40);
+    ctx.strokeStyle='#38bdf8'; ctx.lineWidth=1.5;
+    const nA=Math.max(4,Math.floor((x2-x1)/18));
+    for(let k=0;k<=nA;k++){const ax=x1+k*(x2-x1)/nA;drawArrow(ctx,ax,beamY-50,ax,beamY-2,'#38bdf8',1.5,5);}
+    ctx.fillStyle='#38bdf8'; ctx.font='600 11px JetBrains Mono,monospace';
+    ctx.fillText(cd.wi==cd.wf?cd.wi+' kN/m':cd.wi+'→'+cd.wf+' kN/m',(x1+x2)/2-30,30);
+  });
+  ctx.strokeStyle='#e6edf3'; ctx.lineWidth=5; ctx.lineCap='square';
+  ctx.beginPath(); ctx.moveTo(PAD,beamY); ctx.lineTo(W-PAD,beamY); ctx.stroke();
+  ctx.strokeStyle='rgba(249,115,22,0.3)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(PAD,beamY-3); ctx.lineTo(W-PAD,beamY-3); ctx.stroke();
+  if(tipo==='eng'){
+    const xEng=parseFloat(document.getElementById('apEngX')?.value)||0;
+    drawEngaste(ctx,px(xEng),beamY,xEng<=L/2?'left':'right');
+  } else {
+    const xP=parseFloat(document.getElementById('apPinoX')?.value)??0;
+    const xR=parseFloat(document.getElementById('apRoleteX')?.value)??L;
+    drawPino(ctx,px(xP),beamY); drawRolete(ctx,px(xR),beamY);
+  }
+  state.cc.forEach(c=>{
+    const cx=px(c.pos),dir=c.val>=0?1:-1,corC=c.val>=0?'#f97316':'#4ade80';
+    drawArrow(ctx,cx,beamY-dir*55,cx,beamY-dir*8,corC,2.5,9);
+    ctx.fillStyle=corC; ctx.font='700 12px JetBrains Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(Math.abs(c.val)+' kN',cx,beamY-dir*60);
+  });
+  state.me.forEach(m=>{
+    const mx=px(m.pos); ctx.strokeStyle='#fbbf24'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(mx,beamY-2,14,m.val>=0?0.2:Math.PI+0.2,m.val>=0?Math.PI-0.2:2*Math.PI-0.2,m.val<0); ctx.stroke();
+    ctx.fillStyle='#fbbf24'; ctx.font='700 11px JetBrains Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(Math.abs(m.val)+' kN·m',mx,beamY-22);
+  });
+  ctx.strokeStyle='rgba(139,148,158,0.4)'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+  ctx.beginPath(); ctx.moveTo(PAD,155); ctx.lineTo(W-PAD,155); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='#8b949e'; ctx.font='10px JetBrains Mono,monospace'; ctx.textAlign='center';
+  [0,0.25,0.5,0.75,1].forEach(f=>{
+    const xm=PAD+f*beamW;
+    ctx.beginPath(); ctx.moveTo(xm,150); ctx.lineTo(xm,160); ctx.stroke();
+    ctx.fillStyle='#8b949e'; ctx.fillText((f*L).toFixed(1)+'m',xm,170);
+  });
+}
+
+function drawArrow(ctx,x1,y1,x2,y2,color,lw,hs){
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=lw;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const angle=Math.atan2(y2-y1,x2-x1);
+  ctx.beginPath(); ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-hs*Math.cos(angle-0.45),y2-hs*Math.sin(angle-0.45));
+  ctx.lineTo(x2-hs*Math.cos(angle+0.45),y2-hs*Math.sin(angle+0.45));
+  ctx.closePath(); ctx.fill();
+}
+function drawPino(ctx,x,y){
+  ctx.fillStyle='#38bdf8'; ctx.strokeStyle='#38bdf8'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x,y+2); ctx.lineTo(x-12,y+22); ctx.lineTo(x+12,y+22); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(x-16,y+22); ctx.lineTo(x+16,y+22); ctx.stroke();
+  ctx.fillStyle='#38bdf8'; ctx.font='600 10px JetBrains Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('△A',x,y+38);
+}
+function drawRolete(ctx,x,y){
+  ctx.fillStyle='#4ade80'; ctx.strokeStyle='#4ade80'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x,y+2); ctx.lineTo(x-12,y+20); ctx.lineTo(x+12,y+20); ctx.closePath(); ctx.stroke();
+  [-7,0,7].forEach(dx=>{ctx.beginPath(); ctx.arc(x+dx,y+23,3,0,Math.PI*2); ctx.stroke();});
+  ctx.beginPath(); ctx.moveTo(x-16,y+26); ctx.lineTo(x+16,y+26); ctx.stroke();
+  ctx.fillStyle='#4ade80'; ctx.font='600 10px JetBrains Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('▽B',x,y+38);
+}
+function drawEngaste(ctx,x,y,side='left'){
+  ctx.strokeStyle='#f97316'; ctx.fillStyle='rgba(249,115,22,0.2)'; ctx.lineWidth=1.5;
+  ctx.fillRect(side==='left'?x-20:x,y-30,20,60);
+  ctx.strokeRect(side==='left'?x-20:x,y-30,20,60);
+  ctx.strokeStyle='rgba(249,115,22,0.5)'; ctx.lineWidth=1;
+  for(let dy=-30;dy<=30;dy+=10){
+    const bx=side==='left'?x-20:x;
+    ctx.beginPath(); ctx.moveTo(bx,y+dy); ctx.lineTo(bx+(side==='left'?-8:8),y+dy+10); ctx.stroke();
+  }
+  ctx.fillStyle='#f97316'; ctx.font='600 10px JetBrains Mono,monospace';
+  ctx.textAlign=side==='left'?'right':'left';
+  ctx.fillText('▐A',side==='left'?x-22:x+22,y+4);
+}
+
+function somaFy(){
+  let s=state.cc.reduce((a,c)=>a+c.val,0);
+  s+=state.cd.reduce((a,c)=>a+resultanteCD(c),0); return s;
+}
+function resultanteCD(cd){return 0.5*(cd.wi+cd.wf)*(cd.xf-cd.xi);}
+function xResultanteCD(cd){
+  const L=cd.xf-cd.xi;
+  if(Math.abs(cd.wi-cd.wf)<1e-9) return cd.xi+L/2;
+  return cd.xi+(L/3)*(cd.wi+2*cd.wf)/(cd.wi+cd.wf);
+}
+function momentoEm(xRef){
+  let M=0;
+  state.cc.forEach(c=>{M+=c.val*(c.pos-xRef);});
+  state.cd.forEach(cd=>{M+=resultanteCD(cd)*(xResultanteCD(cd)-xRef);});
+  state.me.forEach(me=>{M-=me.val;});
+  return M;
+}
+
+function calcular(){
+  const tipo=document.getElementById('vigaTipo').value;
+  const nome=document.getElementById('vigaNome').value||'Viga';
+  const L=parseFloat(document.getElementById('vigaL').value);
+  showError('');
+  document.getElementById('resultado').style.display='none';
+  document.getElementById('emptyState').style.display='none';
+  try {
+    let res;
+    if(tipo==='eng'){
+      const xA=parseFloat(document.getElementById('apEngX').value)||0;
+      res=calcEngaste(xA,nome,L);
+    } else {
+      const xA=parseFloat(document.getElementById('apPinoX').value)??0;
+      const xB=parseFloat(document.getElementById('apRoleteX').value)??L;
+      if(Math.abs(xB-xA)<0.01) throw new Error('Apoios A e B estão na mesma posição!');
+      res=calcSA(xA,xB,nome,L);
+    }
+    renderResultado(res); desenharVigaComReacoes(res);
+  } catch(e){ showError(e.message); document.getElementById('emptyState').style.display='flex'; }
+}
+
+function calcSA(xA,xB,nome,L){
+  const d=xB-xA, M_A=momentoEm(xA), Rb=M_A/d, soma=somaFy(), Ra=soma-Rb;
+  const chkFy=Math.abs(Ra+Rb-soma), chkMA=Math.abs(Rb*d-M_A);
+  const M_B=momentoEm(xB), chkMB=Math.abs(Ra*(xB-xA)+M_B);
+  return {tipo:'sa',nome,L,xA,xB,d,Ra,Rb,Ha:0,soma,M_A,chkFy,chkMA,chkMB};
+}
+function calcEngaste(xA,nome,L){
+  const soma=somaFy(), Ra=soma, Ha=0, Ma=momentoEm(xA);
+  return {tipo:'eng',nome,L,xA,Ra,Ha,Ma,soma,chkFy:Math.abs(Ra-soma),chkM:0};
+}
+
+function renderResultado(res){
+  document.getElementById('resNome').textContent=res.nome;
+  document.getElementById('resDesc').textContent=res.tipo==='sa'
+    ?`Viga simplesmente apoiada — A(x=${res.xA}m) + B(x=${res.xB}m) — L=${res.L}m`
+    :`Viga em balanço — Engaste em x=${res.xA}m — L=${res.L}m`;
+  const grid=document.getElementById('reactionsGrid');
+  if(res.tipo==='sa'){
+    grid.innerHTML=rCard('H_A',res.Ha,'kN',res.Ha>=0?'→':'←','#8b949e','Horizontal no pino')
+      +rCard('R_A',res.Ra,'kN',res.Ra>=0?'↑':'↓','#f97316',`Pino @ x=${res.xA}m`)
+      +rCard('R_B',res.Rb,'kN',res.Rb>=0?'↑':'↓','#4ade80',`Rolete @ x=${res.xB}m`);
+  } else {
+    grid.innerHTML=rCard('H_A',res.Ha,'kN','→','#8b949e','Horizontal')
+      +rCard('R_A',res.Ra,'kN',res.Ra>=0?'↑':'↓','#f97316',`Vertical @ x=${res.xA}m`)
+      +rCard('M_A',res.Ma,'kN·m',res.Ma>=0?'↺':'↻','#fbbf24','Momento no engaste');
+  }
+  const container=document.getElementById('stepsContainer');
+  container.innerHTML='';
+  if(res.tipo==='sa') renderPassosSA(res,container);
+  else renderPassosEng(res,container);
+  document.getElementById('resultado').style.display='flex';
+}
+
+function rCard(label,val,unit,dir,color,sub){
+  return `<div class="reaction-card">
+    <div class="rc-label">${label}</div>
+    <div class="rc-value" style="color:${color}">${fmt(Math.abs(val))}</div>
+    <div class="rc-unit">${unit}</div><div class="rc-dir">${dir}</div>
+    <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">${sub}</div></div>`;
+}
+function fmt(v){return Math.abs(v)<0.001?'0':v.toFixed(2);}
+
+function renderPassosSA(res,container){
+  const {xA,xB,d,Ra,Rb,soma,M_A}=res;
+  addStep(container,0,'📚 Fundamentos',`<div class="eq-block">
+    <div class="eq-line">ΣFx = 0  →  H<sub>A</sub> = 0</div>
+    <div class="eq-line">ΣM<sub>A</sub> = 0  →  isola R<sub>B</sub></div>
+    <div class="eq-line">ΣFy = 0  →  isola R<sub>A</sub></div></div>
+    <div class="gap8 mt8"><span class="info-chip">Pino A @ x=${xA}m</span>
+    <span class="info-chip">Rolete B @ x=${xB}m</span><span class="info-chip">d = ${d.toFixed(4)} m</span></div>`);
+  addStep(container,2,'Equação 1 — ΣFx = 0',`<div class="eq-block">
+    <div class="eq-line">ΣFx = 0  →  H<sub>A</sub> = 0 kN</div>
+    <div class="eq-result">∴ H<sub>A</sub> = 0 kN</div></div>`);
+  let momTable=`<table class="contrib-table"><thead><tr><th>Carga</th><th>F(kN)</th><th>x(m)</th><th>Braço(m)</th><th>M(kN·m)</th></tr></thead><tbody>`;
+  let somaM=0;
+  state.cc.forEach(c=>{const b=c.pos-xA,m=c.val*b;somaM+=m;
+    momTable+=`<tr><td>F=${c.val}kN@${c.pos}m</td><td>${c.val}</td><td>${c.pos}</td><td>${b.toFixed(4)}</td><td class="${m>=0?'pos':'neg'}">${m>=0?'+':''}${m.toFixed(4)}</td></tr>`;});
+  state.cd.forEach((cd,i)=>{const R=resultanteCD(cd),xR=xResultanteCD(cd),b=xR-xA,m=R*b;somaM+=m;
+    momTable+=`<tr><td>R${i+1}=${R.toFixed(2)}kN@${xR.toFixed(2)}m</td><td>${R.toFixed(4)}</td><td>${xR.toFixed(4)}</td><td>${b.toFixed(4)}</td><td class="${m>=0?'pos':'neg'}">${m>=0?'+':''}${m.toFixed(4)}</td></tr>`;});
+  state.me.forEach(me=>{const c=-me.val;somaM+=c;
+    momTable+=`<tr><td>M_ext=${me.val}kN·m</td><td colspan="3" style="color:var(--muted)">direto</td><td class="${c>=0?'pos':'neg'}">${c>=0?'+':''}${c.toFixed(4)}</td></tr>`;});
+  momTable+=`<tr><td colspan="4">Σ(M_cargas)</td><td>${somaM.toFixed(4)}</td></tr></tbody></table>`;
+  momTable+=`<div class="eq-block">
+    <div class="eq-line">R<sub>B</sub> × ${d.toFixed(4)} = ${somaM.toFixed(4)}</div>
+    <div class="eq-result">∴ R<sub>B</sub> = ${Rb.toFixed(4)} kN ${Rb>=0?'↑':'↓'}</div></div>`;
+  addStep(container,3,`Equação 2 — ΣM_A = 0 → R_B`,momTable);
+  addStep(container,4,`Equação 3 — ΣFy = 0 → R_A`,`<div class="eq-block">
+    <div class="eq-line">R<sub>A</sub> + ${Rb.toFixed(4)} − ${soma.toFixed(4)} = 0</div>
+    <div class="eq-result">∴ R<sub>A</sub> = ${Ra.toFixed(4)} kN ${Ra>=0?'↑':'↓'}</div></div>`);
+  const ok1=Math.abs(res.chkFy)<1e-4,ok2=Math.abs(res.chkMA)<1e-4,ok3=Math.abs(res.chkMB)<1e-4;
+  addStep(container,5,`✅ Verificação${ok1&&ok2&&ok3?' — APROVADO ✓':' — ATENÇÃO !'}`,
+    checkRow(ok1,'ΣFy = R_A + R_B − ΣF_ext',`${Ra.toFixed(4)}+${Rb.toFixed(4)}-${soma.toFixed(4)}`,res.chkFy)
+    +checkRow(ok2,'ΣM_A = R_B×d − Σ(M_cargas)',`${Rb.toFixed(4)}×${d.toFixed(4)}-${M_A.toFixed(4)}`,res.chkMA)
+    +checkRow(ok3,'ΣM_B (verificação independente)','R_A×d + Σ(M em B)',res.chkMB));
+}
+
+function renderPassosEng(res,container){
+  const {xA,Ra,Ha,Ma,soma}=res;
+  addStep(container,0,'📚 Fundamentos — Viga em Balanço',`<div class="eq-block">
+    <div class="eq-line">ΣFx=0 → H<sub>A</sub></div><div class="eq-line">ΣFy=0 → R<sub>A</sub></div>
+    <div class="eq-line">ΣM<sub>A</sub>=0 → M<sub>A</sub></div></div>`);
+  addStep(container,2,'Equação 1 — ΣFx = 0',`<div class="eq-block"><div class="eq-result">∴ H<sub>A</sub> = 0 kN</div></div>`);
+  addStep(container,3,'Equação 2 — ΣFy = 0 → R_A',`<div class="eq-block">
+    <div class="eq-line">R<sub>A</sub> = ΣF_ext = ${soma.toFixed(4)} kN</div>
+    <div class="eq-result">∴ R<sub>A</sub> = ${Ra.toFixed(4)} kN ${Ra>=0?'↑':'↓'}</div></div>`);
+  let somaM=0,momBody='';
+  state.cc.forEach(c=>{const b=c.pos-xA,m=c.val*b;somaM+=m;momBody+=`<div class="eq-line">F=${c.val}kN × braço=${b.toFixed(4)}m = ${m>=0?'+':''}${m.toFixed(4)} kN·m</div>`;});
+  state.cd.forEach((cd,i)=>{const R=resultanteCD(cd),xR=xResultanteCD(cd),b=xR-xA,m=R*b;somaM+=m;momBody+=`<div class="eq-line">R${i+1}=${R.toFixed(2)}kN × braço=${b.toFixed(4)}m = ${m>=0?'+':''}${m.toFixed(4)} kN·m</div>`;});
+  state.me.forEach(me=>{const c=-me.val;somaM+=c;momBody+=`<div class="eq-line">M_ext: ${c>=0?'+':''}${c.toFixed(4)} kN·m</div>`;});
+  addStep(container,4,'Equação 3 — ΣM_A = 0 → M_A',`<div class="eq-block">${momBody}
+    <div class="eq-line">Σ(M_cargas) = ${somaM.toFixed(4)} kN·m</div>
+    <div class="eq-result">∴ M<sub>A</sub> = ${Ma.toFixed(4)} kN·m ${Ma>=0?'↺':'↻'}</div></div>`);
+  addStep(container,5,`✅ Verificação${Math.abs(res.chkFy)<1e-4?' — APROVADO ✓':' — ATENÇÃO !'}`,
+    checkRow(Math.abs(res.chkFy)<1e-4,'ΣFy = R_A − ΣF_ext',`${Ra.toFixed(4)}-${soma.toFixed(4)}`,res.chkFy));
+}
+
+function addStep(container,num,titulo,corpo){
+  const div=document.createElement('div');
+  div.className=`step${num<=1?' open':''}`;
+  div.innerHTML=`<div class="step-header" onclick="toggleStep(this)">
+    <div class="step-num">${num}</div><div class="step-title">${titulo}</div>
+    <div class="step-toggle">▼</div></div>
+    <div class="step-body" style="padding-top:14px">${corpo}</div>`;
+  container.appendChild(div);
+}
+function toggleStep(h){h.parentElement.classList.toggle('open');}
+function checkRow(ok,label,expr,val){
+  return `<div class="check-row ${ok?'ok':'err'}">
+    <div class="check-icon">${ok?'✅':'❌'}</div>
+    <div><div style="color:var(--text);font-size:0.82rem;font-weight:600">${label}</div>
+    <div style="color:var(--muted);font-size:0.77rem;margin-top:2px">= ${expr} = ${val.toExponential(2)}</div></div>
+    <div class="check-val">${ok?'≈ 0 ✓':'≠ 0 !'}</div></div>`;
+}
+function showError(msg){
+  const box=document.getElementById('errorBox');
+  if(msg){box.textContent='⚠️ '+msg;box.style.display='block';}
+  else box.style.display='none';
+}
+function desenharVigaComReacoes(res){
+  desenharViga();
+  const canvas=document.getElementById('vigaCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,L=res.L,PAD=60,beamW=W-PAD*2,beamY=100;
+  function px(x){return PAD+(x/L)*beamW;}
+  if(res.tipo==='sa'){
+    drawReactionArrow(ctx,px(res.xA),beamY,res.Ra,'R_A');
+    drawReactionArrow(ctx,px(res.xB),beamY,res.Rb,'R_B');
+  } else {
+    drawReactionArrow(ctx,px(res.xA),beamY,res.Ra,'R_A');
+  }
+}
+function drawReactionArrow(ctx,x,beamY,val,label){
+  if(Math.abs(val)<0.001) return;
+  const dir=val>=0?-1:1,color=val>=0?'#4ade80':'#f87171';
+  const startY=beamY+dir*55,endY=beamY+dir*8;
+  drawArrow(ctx,x,startY,x,endY,color,2.5,9);
+  ctx.fillStyle=color; ctx.font='700 11px JetBrains Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText(label+'='+fmt(Math.abs(val))+'kN',x,startY+(val>=0?-6:16));
+}
+
+function loadEx(n){
+  resetar();
+  if(n===1){
+    document.getElementById('vigaNome').value='Exercício 1 — 150 kN';
+    document.getElementById('vigaL').value='5';
+    document.getElementById('vigaTipo').value='sa';
+    renderApoiosCard();
+    document.getElementById('apPinoX').value='0';
+    document.getElementById('apRoleteX').value='5';
+    state.cc.push({pos:3,val:150});
+  } else if(n===2){
+    document.getElementById('vigaNome').value='Exercício 2 — Engaste';
+    document.getElementById('vigaL').value='5';
+    document.getElementById('vigaTipo').value='eng';
+    renderApoiosCard();
+    document.getElementById('apEngX').value='0';
+    state.cc.push({pos:3,val:100},{pos:5,val:200});
+  } else if(n===3){
+    document.getElementById('vigaNome').value='Exercício 3';
+    document.getElementById('vigaL').value='12';
+    document.getElementById('vigaTipo').value='sa';
+    renderApoiosCard();
+    document.getElementById('apPinoX').value='2';
+    document.getElementById('apRoleteX').value='10';
+    state.cc.push({pos:0,val:50},{pos:12,val:50});
+    state.cd.push({xi:0,xf:12,wi:240,wf:240});
+  } else if(n===4){
+    document.getElementById('vigaNome').value='Exercício 4';
+    document.getElementById('vigaL').value='10';
+    document.getElementById('vigaTipo').value='sa';
+    renderApoiosCard();
+    document.getElementById('apPinoX').value='2';
+    document.getElementById('apRoleteX').value='10';
+    state.cc.push({pos:0,val:50});
+    state.cd.push({xi:0,xf:10,wi:240,wf:240});
+  }
+  renderLists(); desenharViga();
+}
+
+function resetar(){
+  state.cc=[];state.cd=[];state.me=[];
+  document.getElementById('vigaNome').value='Viga 1';
+  document.getElementById('vigaL').value='5';
+  document.getElementById('vigaTipo').value='sa';
+  renderApoiosCard(); renderLists();
+  document.getElementById('resultado').style.display='none';
+  document.getElementById('emptyState').style.display='flex';
+  showError(''); desenharViga();
+}
+</script>
+</body>
+</html>
