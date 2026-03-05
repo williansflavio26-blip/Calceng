@@ -1,0 +1,2663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CalcEng — Calculadoras de Engenharia</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0e1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CalcEng">
+<link rel="apple-touch-icon" href="icon-192.png">
+<!-- Fonts for both apps -->
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Lato:wght@300;400;700&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════
+   MENU PRINCIPAL
+══════════════════════════════════════ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+#home-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #0a0e1a;
+  padding: 24px;
+  font-family: 'Syne', sans-serif;
+}
+
+.menu-logo {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #f97316;
+  letter-spacing: -1px;
+  margin-bottom: 6px;
+}
+.menu-logo span { color: #e6edf3; }
+
+.menu-sub {
+  color: #8b949e;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 48px;
+}
+
+.menu-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.menu-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 16px;
+  padding: 28px 24px;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.menu-card:hover, .menu-card:active {
+  border-color: var(--mc);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.menu-card .mc-icon {
+  width: 64px; height: 64px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.menu-card h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #e6edf3;
+  margin-bottom: 4px;
+}
+.menu-card p {
+  font-size: 0.8rem;
+  color: #8b949e;
+  font-family: 'Lato', sans-serif;
+  line-height: 1.5;
+}
+.menu-card .mc-arrow {
+  margin-left: auto;
+  color: #30363d;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  transition: color .2s;
+}
+.menu-card:hover .mc-arrow { color: var(--mc); }
+
+.menu-footer {
+  margin-top: 40px;
+  color: #30363d;
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+/* ══════════════════════════════════════
+   APPS WRAPPER
+══════════════════════════════════════ */
+#app-vigas, #app-elec {
+  display: none;
+  min-height: 100vh;
+}
+#app-vigas.active, #app-elec.active {
+  display: block;
+}
+
+/* ── BOTÃO VOLTAR (flutuante) ── */
+.btn-back {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 9999;
+  background: rgba(10,14,26,0.92);
+  border: 1px solid #30363d;
+  border-radius: 50px;
+  color: #e6edf3;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 8px 16px 8px 12px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  gap: 6px;
+  backdrop-filter: blur(8px);
+  transition: all .2s;
+}
+.btn-back.visible { display: flex; }
+.btn-back:hover { border-color: #f97316; color: #f97316; }
+</style>
+
+<!-- ══ VIGAS CSS (scoped) ══ -->
+<style id="vigas-styles">
+#app-vigas {
+  --bg:       #0d1117;
+  --surface:  #161b22;
+  --surface2: #1e2530;
+  --border:   #30363d;
+  --accent:   #f97316;
+  --accent2:  #fb923c;
+  --blue:     #38bdf8;
+  --green:    #4ade80;
+  --red:      #f87171;
+  --yellow:   #fbbf24;
+  --text:     #e6edf3;
+  --muted:    #8b949e;
+  --radius:   10px;
+  font-family: 'Lato', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+#app-vigas * { box-sizing: border-box; margin: 0; padding: 0; }
+#app-vigas header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 32px 18px 120px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(12px);
+}
+#app-vigas .logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: #f97316;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+#app-vigas .logo span { color: var(--text); }
+#app-vigas header p {
+  color: var(--muted);
+  font-size: 0.82rem;
+  border-left: 2px solid var(--border);
+  padding-left: 20px;
+}
+#app-vigas .badge {
+  margin-left: auto;
+  background: rgba(249,115,22,0.15);
+  color: #f97316;
+  border: 1px solid rgba(249,115,22,0.3);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+}
+#app-vigas .app {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  min-height: calc(100vh - 61px);
+}
+#app-vigas .panel-left {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+#app-vigas .section-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #f97316;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#app-vigas .section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+#app-vigas .card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+#app-vigas label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+#app-vigas input[type=number],
+#app-vigas input[type=text],
+#app-vigas select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 9px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color .2s;
+  appearance: auto;
+}
+#app-vigas input:focus, #app-vigas select:focus { border-color: #f97316; }
+#app-vigas .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+#app-vigas .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+#app-vigas .btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 7px; padding: 9px 16px; border: none; border-radius: 7px;
+  font-family: 'Syne', sans-serif; font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; transition: all .18s; letter-spacing: 0.3px;
+}
+#app-vigas .btn-primary {
+  background: #f97316; color: #fff; width: 100%; padding: 12px; font-size: 0.95rem;
+}
+#app-vigas .btn-primary:hover { background: #fb923c; transform: translateY(-1px); }
+#app-vigas .btn-outline {
+  background: transparent; border: 1px solid var(--border); color: var(--muted);
+}
+#app-vigas .btn-outline:hover { border-color: #f97316; color: #f97316; }
+#app-vigas .btn-danger {
+  background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3);
+  color: #f87171; padding: 6px 10px; font-size: 0.75rem;
+}
+#app-vigas .btn-danger:hover { background: rgba(248,113,113,0.25); }
+#app-vigas .btn-add {
+  background: rgba(74,222,128,0.1); border: 1px dashed rgba(74,222,128,0.4);
+  color: #4ade80; width: 100%; padding: 8px; font-size: 0.8rem;
+}
+#app-vigas .btn-add:hover { background: rgba(74,222,128,0.2); }
+#app-vigas .btn-example {
+  background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25);
+  color: #38bdf8; font-size: 0.78rem; padding: 7px 12px;
+}
+#app-vigas .btn-example:hover { background: rgba(56,189,248,0.2); }
+#app-vigas .item-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+#app-vigas .item-row {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  padding: 10px 12px; display: flex; align-items: center; gap: 10px;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  animation: vgSlideIn .2s ease;
+}
+@keyframes vgSlideIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
+#app-vigas .item-row .tag {
+  background: rgba(249,115,22,0.15); color: #f97316;
+  padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
+}
+#app-vigas .item-row .tag.blue  { background: rgba(56,189,248,0.15); color: #38bdf8; }
+#app-vigas .item-row .tag.green { background: rgba(74,222,128,0.15); color: #4ade80; }
+#app-vigas .item-row .tag.yel   { background: rgba(251,191,36,0.15);  color: #fbbf24; }
+#app-vigas .item-row span { flex: 1; color: var(--muted); }
+#app-vigas .item-row .val { color: var(--text); font-weight: 500; }
+#app-vigas .examples-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#app-vigas .panel-right { padding: 28px 32px; overflow-y: auto; display: flex; flex-direction: column; gap: 28px; }
+#app-vigas .canvas-wrapper {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px;
+}
+#app-vigas .canvas-title {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
+  color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px;
+}
+#app-vigas canvas { width: 100%; border-radius: 6px; display: block; }
+#app-vigas #resultado { display: none; flex-direction: column; gap: 20px; animation: vgFadeUp .4s ease; }
+@keyframes vgFadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+#app-vigas .result-header {
+  background: linear-gradient(135deg, rgba(249,115,22,0.12), rgba(249,115,22,0.04));
+  border: 1px solid rgba(249,115,22,0.25); border-radius: var(--radius); padding: 20px 24px;
+  display: flex; align-items: center; gap: 16px;
+}
+#app-vigas .result-header .icon {
+  width: 48px; height: 48px; background: #f97316; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0;
+}
+#app-vigas .result-header h2 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; }
+#app-vigas .result-header p { color: var(--muted); font-size: 0.85rem; margin-top: 3px; }
+#app-vigas .reactions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+#app-vigas .reaction-card {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px; text-align: center; transition: border-color .2s;
+}
+#app-vigas .reaction-card:hover { border-color: #f97316; }
+#app-vigas .reaction-card .rc-label { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
+#app-vigas .reaction-card .rc-value { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; color: #f97316; }
+#app-vigas .reaction-card .rc-unit { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+#app-vigas .reaction-card .rc-dir { font-size: 1.2rem; margin-top: 4px; }
+#app-vigas .steps-container { display: flex; flex-direction: column; gap: 14px; }
+#app-vigas .step { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+#app-vigas .step-header {
+  padding: 14px 18px; display: flex; align-items: center; gap: 14px;
+  cursor: pointer; user-select: none; transition: background .15s;
+}
+#app-vigas .step-header:hover { background: rgba(255,255,255,0.03); }
+#app-vigas .step-num {
+  width: 30px; height: 30px; border-radius: 50%; background: #f97316; color: #fff;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+#app-vigas .step-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem; flex: 1; }
+#app-vigas .step-toggle { color: var(--muted); font-size: 1rem; transition: transform .2s; }
+#app-vigas .step.open .step-toggle { transform: rotate(180deg); }
+#app-vigas .step-body { display: none; padding: 0 18px 18px; border-top: 1px solid var(--border); }
+#app-vigas .step.open .step-body { display: block; }
+#app-vigas .eq-block {
+  background: var(--bg); border-left: 3px solid #f97316; border-radius: 0 6px 6px 0;
+  padding: 14px 16px; margin: 12px 0; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; line-height: 1.8;
+}
+#app-vigas .eq-block .eq-line { color: var(--text); }
+#app-vigas .eq-block .eq-result { color: #f97316; font-weight: 700; font-size: 0.95rem; }
+#app-vigas .eq-block .eq-comment { color: var(--muted); font-size: 0.78rem; font-style: italic; }
+#app-vigas .contrib-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; margin: 12px 0; }
+#app-vigas .contrib-table th { background: var(--bg); color: var(--muted); padding: 8px 10px; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); }
+#app-vigas .contrib-table td { padding: 8px 10px; border-bottom: 1px solid rgba(48,54,61,0.5); color: var(--text); }
+#app-vigas .contrib-table tr:last-child td { border-bottom: none; color: #f97316; font-weight: 700; }
+#app-vigas .contrib-table .pos { color: #4ade80; }
+#app-vigas .contrib-table .neg { color: #f87171; }
+#app-vigas .check-row {
+  display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 6px; margin: 6px 0;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.83rem;
+}
+#app-vigas .check-row.ok  { background: rgba(74,222,128,0.08);  border: 1px solid rgba(74,222,128,0.2); }
+#app-vigas .check-row.err { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); }
+#app-vigas .check-icon { font-size: 1.1rem; flex-shrink: 0; }
+#app-vigas .check-label { flex: 1; color: var(--muted); }
+#app-vigas .check-val { color: var(--text); font-weight: 700; }
+#app-vigas .error-box {
+  background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3);
+  border-radius: var(--radius); padding: 16px 20px; color: #f87171; font-size: 0.9rem; display: none;
+}
+#app-vigas .empty-state {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; color: var(--muted); text-align: center; padding: 60px 20px;
+}
+#app-vigas .empty-state .big { font-size: 3rem; }
+#app-vigas .empty-state h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; color: var(--text); margin-top: 8px; }
+#app-vigas .empty-state p { font-size: 0.88rem; max-width: 320px; line-height: 1.6; }
+#app-vigas .mt8 { margin-top: 8px; }
+#app-vigas .mt12 { margin-top: 12px; }
+#app-vigas .gap8 { display: flex; gap: 8px; flex-wrap: wrap; }
+#app-vigas .info-chip {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+  background: rgba(56,189,248,0.1); color: #38bdf8; border: 1px solid rgba(56,189,248,0.2);
+  padding: 3px 8px; border-radius: 4px;
+}
+@media (max-width: 900px) {
+  #app-vigas .app { grid-template-columns: 1fr; }
+  #app-vigas .panel-left { border-right: none; border-bottom: 1px solid var(--border); }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ BOTÃO VOLTAR ══════════════ -->
+<button class="btn-back" id="btnBack" onclick="goHome()">← Menu</button>
+
+<!-- ══════════════ MENU PRINCIPAL ══════════════ -->
+<div id="home-menu">
+  <div class="menu-logo">CALC<span>ENG</span></div>
+  <div class="menu-sub">Calculadoras de Engenharia</div>
+
+  <div class="menu-cards">
+    <div class="menu-card" style="--mc:#f97316" onclick="openApp('vigas')">
+      <div class="mc-icon">🏗</div>
+      <div>
+        <h2>VigaCalc</h2>
+        <p>Reações de apoio em vigas isostáticas — Pino, Rolete, Engaste</p>
+      </div>
+      <div class="mc-arrow">›</div>
+    </div>
+
+    <div class="menu-card" style="--mc:#00d4ff" onclick="openApp('elec')">
+      <div class="mc-icon">⚡</div>
+      <div>
+        <h2>Calculadora Elétrica</h2>
+        <p>Lei de Ohm, Resistores, Dimensionamento, Motores e Quiz</p>
+      </div>
+      <div class="mc-arrow">›</div>
+    </div>
+  </div>
+
+  <div class="menu-footer">ENGENHARIA CIVIL &amp; ELÉTRICA · v2.0</div>
+</div>
+
+<!-- ══════════════ APP VIGAS ══════════════ -->
+<div id="app-vigas">
+  <header>
+    <div class="logo">VIGA<span>CALC</span></div>
+    <p>Calculadora de Reações de Apoio — Vigas Isostáticas</p>
+    <div class="badge">ENG. CIVIL</div>
+  </header>
+
+  <div class="app">
+    <aside class="panel-left">
+      <div>
+        <div class="section-label">Identificação</div>
+        <div class="card">
+          <label>Nome / Código da Viga</label>
+          <input type="text" id="vigaNome" value="Viga 1" placeholder="ex: Exercício 3">
+          <div class="mt12 row2">
+            <div>
+              <label>Comprimento L (m)</label>
+              <input type="number" id="vigaL" value="5" step="0.5" min="0.1">
+            </div>
+            <div>
+              <label>Tipo de Apoio</label>
+              <select id="vigaTipo">
+                <option value="sa">Pino + Rolete</option>
+                <option value="eng">Engaste</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="apoiosSection">
+        <div class="section-label">Apoios</div>
+        <div class="card" id="apoiosCard"></div>
+      </div>
+
+      <div>
+        <div class="section-label">Cargas Concentradas</div>
+        <div class="card">
+          <div class="row3">
+            <div>
+              <label>Posição (m)</label>
+              <input type="number" id="ccPos" step="0.5" placeholder="x">
+            </div>
+            <div>
+              <label>Valor (kN)</label>
+              <input type="number" id="ccVal" step="10" placeholder="↓+">
+            </div>
+            <div style="display:flex;align-items:flex-end;">
+              <button class="btn btn-add" onclick="addCC()" style="padding:9px 10px;">+ Add</button>
+            </div>
+          </div>
+          <div class="item-list" id="ccList"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Cargas Distribuídas</div>
+        <div class="card">
+          <div class="row2">
+            <div><label>De x (m)</label><input type="number" id="cdXi" step="0.5" placeholder="início"></div>
+            <div><label>Até x (m)</label><input type="number" id="cdXf" step="0.5" placeholder="fim"></div>
+          </div>
+          <div class="row2 mt8">
+            <div><label>w início (kN/m)</label><input type="number" id="cdWi" step="10" placeholder="↓+"></div>
+            <div><label>w fim (kN/m)</label><input type="number" id="cdWf" step="10" placeholder="= início se uniforme"></div>
+          </div>
+          <button class="btn btn-add mt8" onclick="addCD()">+ Adicionar Carga Distribuída</button>
+          <div class="item-list" id="cdList"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Momentos Externos</div>
+        <div class="card">
+          <div class="row2">
+            <div><label>Posição (m)</label><input type="number" id="mePos" step="0.5" placeholder="x"></div>
+            <div><label>Valor (kN·m)</label><input type="number" id="meVal" step="10" placeholder="↺ +"></div>
+          </div>
+          <button class="btn btn-add mt8" onclick="addME()">+ Adicionar Momento</button>
+          <div class="item-list" id="meList"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Exemplos Rápidos</div>
+        <div class="examples-grid">
+          <button class="btn btn-example" onclick="loadEx(1)">📐 Ex.1 — 150 kN</button>
+          <button class="btn btn-example" onclick="loadEx(2)">🔩 Ex.2 — Engaste</button>
+          <button class="btn btn-example" onclick="loadEx(3)">📊 Ex.3 — Dist+Bal.</button>
+          <button class="btn btn-example" onclick="loadEx(4)">⚖️ Ex.4 — Balanço</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="calcular()">⚡ CALCULAR REAÇÕES</button>
+      <button class="btn btn-outline" onclick="resetar()">🗑 Limpar tudo</button>
+    </aside>
+
+    <main class="panel-right">
+      <div class="canvas-wrapper">
+        <div class="canvas-title">📐 Diagrama da Viga</div>
+        <canvas id="vigaCanvas" height="180"></canvas>
+      </div>
+      <div class="error-box" id="errorBox"></div>
+      <div class="empty-state" id="emptyState">
+        <div class="big">🏗</div>
+        <h3>Pronto para calcular</h3>
+        <p>Configure os apoios e carregamentos no painel à esquerda, depois clique em <strong>Calcular Reações</strong>.</p>
+      </div>
+      <div id="resultado">
+        <div class="result-header">
+          <div class="icon">✅</div>
+          <div>
+            <h2 id="resNome">Viga 1</h2>
+            <p id="resDesc">Viga simplesmente apoiada</p>
+          </div>
+        </div>
+        <div>
+          <div class="section-label">Reações de Apoio</div>
+          <div class="reactions-grid" id="reactionsGrid"></div>
+        </div>
+        <div>
+          <div class="section-label">Resolução Detalhada — Passo a Passo</div>
+          <div class="steps-container" id="stepsContainer"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════ APP ELÉTRICA ══════════════ -->
+<div id="app-elec">
+  <!-- conteúdo da calculadora elétrica será inserido via JS -->
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// NAVEGAÇÃO
+// ══════════════════════════════════════════════════════
+function openApp(name) {
+  document.getElementById('home-menu').style.display = 'none';
+  document.getElementById('btnBack').classList.add('visible');
+  if (name === 'vigas') {
+    document.getElementById('app-vigas').classList.add('active');
+    renderApoiosCard();
+    desenharViga();
+  } else {
+    document.getElementById('app-elec').classList.add('active');
+  }
+}
+
+function goHome() {
+  document.getElementById('home-menu').style.display = 'flex';
+  document.getElementById('app-vigas').classList.remove('active');
+  document.getElementById('app-elec').classList.remove('active');
+  document.getElementById('btnBack').classList.remove('visible');
+}
+
+// ══════════════════════════════════════════════════════
+// VIGACALC — ESTADO
+// ══════════════════════════════════════════════════════
+const state = { cc: [], cd: [], me: [] };
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderApoiosCard();
+});
+
+document.getElementById('vigaTipo').addEventListener('change', renderApoiosCard);
+document.getElementById('vigaL').addEventListener('input', desenharViga);
+window.addEventListener('resize', desenharViga);
+
+function renderApoiosCard() {
+  const tipo = document.getElementById('vigaTipo').value;
+  const L    = parseFloat(document.getElementById('vigaL').value) || 5;
+  const card = document.getElementById('apoiosCard');
+  if (tipo === 'eng') {
+    card.innerHTML = `<label>Posição do Engaste (m)</label>
+      <input type="number" id="apEngX" value="0" step="0.5">
+      <p class="mt8" style="font-size:0.78rem;color:var(--muted)">▐ Engaste = 3 reações: R<sub>A</sub> vertical, H<sub>A</sub> horizontal, M<sub>A</sub> momento</p>`;
+  } else {
+    card.innerHTML = `<div class="row2">
+      <div><label>Pino A — posição (m)</label><input type="number" id="apPinoX" value="0" step="0.5"></div>
+      <div><label>Rolete B — posição (m)</label><input type="number" id="apRoleteX" value="${L}" step="0.5"></div>
+      </div>
+      <p class="mt8" style="font-size:0.78rem;color:var(--muted)">△ Pino = R<sub>x</sub> + R<sub>y</sub> &nbsp;|&nbsp; ▽ Rolete = R<sub>y</sub></p>`;
+  }
+  desenharViga();
+}
+
+function addCC() {
+  const pos = parseFloat(document.getElementById('ccPos').value);
+  const val = parseFloat(document.getElementById('ccVal').value);
+  if (isNaN(pos)||isNaN(val)) return alert('Preencha posição e valor da carga.');
+  state.cc.push({pos, val});
+  document.getElementById('ccPos').value = '';
+  document.getElementById('ccVal').value = '';
+  renderLists(); desenharViga();
+}
+function addCD() {
+  const xi=parseFloat(document.getElementById('cdXi').value);
+  const xf=parseFloat(document.getElementById('cdXf').value);
+  const wi=parseFloat(document.getElementById('cdWi').value);
+  const wfRaw=document.getElementById('cdWf').value;
+  const wf=wfRaw===''?wi:parseFloat(wfRaw);
+  if(isNaN(xi)||isNaN(xf)||isNaN(wi)) return alert('Preencha os campos da carga distribuída.');
+  if(xf<=xi) return alert('x fim deve ser maior que x início.');
+  state.cd.push({xi,xf,wi,wf});
+  ['cdXi','cdXf','cdWi','cdWf'].forEach(id=>document.getElementById(id).value='');
+  renderLists(); desenharViga();
+}
+function addME() {
+  const pos=parseFloat(document.getElementById('mePos').value);
+  const val=parseFloat(document.getElementById('meVal').value);
+  if(isNaN(pos)||isNaN(val)) return alert('Preencha posição e valor do momento.');
+  state.me.push({pos,val});
+  document.getElementById('mePos').value='';
+  document.getElementById('meVal').value='';
+  renderLists(); desenharViga();
+}
+function removeCC(i){state.cc.splice(i,1);renderLists();desenharViga();}
+function removeCD(i){state.cd.splice(i,1);renderLists();desenharViga();}
+function removeME(i){state.me.splice(i,1);renderLists();desenharViga();}
+
+function renderLists() {
+  document.getElementById('ccList').innerHTML=state.cc.map((c,i)=>`
+    <div class="item-row"><span class="tag">F</span><span class="val">x=${c.pos}m</span>
+    <span>${c.val>=0?'↓':'↑'} ${Math.abs(c.val)} kN</span>
+    <button class="btn btn-danger" onclick="removeCC(${i})">✕</button></div>`).join('');
+  document.getElementById('cdList').innerHTML=state.cd.map((c,i)=>`
+    <div class="item-row"><span class="tag blue">q</span><span class="val">${c.xi}→${c.xf}m</span>
+    <span>${c.wi==c.wf?c.wi+' kN/m':c.wi+'→'+c.wf+' kN/m'}</span>
+    <button class="btn btn-danger" onclick="removeCD(${i})">✕</button></div>`).join('');
+  document.getElementById('meList').innerHTML=state.me.map((m,i)=>`
+    <div class="item-row"><span class="tag yel">M</span><span class="val">x=${m.pos}m</span>
+    <span>${m.val>=0?'↺':'↻'} ${Math.abs(m.val)} kN·m</span>
+    <button class="btn btn-danger" onclick="removeME(${i})">✕</button></div>`).join('');
+}
+
+function desenharViga() {
+  const canvas=document.getElementById('vigaCanvas');
+  if(!canvas) return;
+  const W=canvas.parentElement.clientWidth-48;
+  canvas.width=W; canvas.height=180;
+  const ctx=canvas.getContext('2d');
+  const L=parseFloat(document.getElementById('vigaL').value)||5;
+  const tipo=document.getElementById('vigaTipo').value;
+  const PAD=60, beamY=100, beamW=W-PAD*2;
+  function px(x){return PAD+(x/L)*beamW;}
+  ctx.clearRect(0,0,W,180);
+  ctx.strokeStyle='rgba(48,54,61,0.4)'; ctx.lineWidth=1;
+  for(let xi=PAD;xi<=W-PAD;xi+=beamW/10){ctx.beginPath();ctx.moveTo(xi,20);ctx.lineTo(xi,160);ctx.stroke();}
+  state.cd.forEach(cd=>{
+    const x1=px(cd.xi),x2=px(cd.xf);
+    ctx.fillStyle='rgba(56,189,248,0.08)'; ctx.fillRect(x1,40,x2-x1,beamY-40);
+    ctx.strokeStyle='#38bdf8'; ctx.lineWidth=1.5;
+    const nA=Math.max(4,Math.floor((x2-x1)/18));
+    for(let k=0;k<=nA;k++){const ax=x1+k*(x2-x1)/nA;drawArrow(ctx,ax,beamY-50,ax,beamY-2,'#38bdf8',1.5,5);}
+    ctx.fillStyle='#38bdf8'; ctx.font='600 11px JetBrains Mono,monospace';
+    ctx.fillText(cd.wi==cd.wf?cd.wi+' kN/m':cd.wi+'→'+cd.wf+' kN/m',(x1+x2)/2-30,30);
+  });
+  ctx.strokeStyle='#e6edf3'; ctx.lineWidth=5; ctx.lineCap='square';
+  ctx.beginPath(); ctx.moveTo(PAD,beamY); ctx.lineTo(W-PAD,beamY); ctx.stroke();
+  ctx.strokeStyle='rgba(249,115,22,0.3)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(PAD,beamY-3); ctx.lineTo(W-PAD,beamY-3); ctx.stroke();
+  if(tipo==='eng'){
+    const xEng=parseFloat(document.getElementById('apEngX')?.value)||0;
+    drawEngaste(ctx,px(xEng),beamY,xEng<=L/2?'left':'right');
+  } else {
+    const xP=parseFloat(document.getElementById('apPinoX')?.value)??0;
+    const xR=parseFloat(document.getElementById('apRoleteX')?.value)??L;
+    drawPino(ctx,px(xP),beamY); drawRolete(ctx,px(xR),beamY);
+  }
+  state.cc.forEach(c=>{
+    const cx=px(c.pos),dir=c.val>=0?1:-1,corC=c.val>=0?'#f97316':'#4ade80';
+    drawArrow(ctx,cx,beamY-dir*55,cx,beamY-dir*8,corC,2.5,9);
+    ctx.fillStyle=corC; ctx.font='700 12px JetBrains Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(Math.abs(c.val)+' kN',cx,beamY-dir*60);
+  });
+  state.me.forEach(m=>{
+    const mx=px(m.pos); ctx.strokeStyle='#fbbf24'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(mx,beamY-2,14,m.val>=0?0.2:Math.PI+0.2,m.val>=0?Math.PI-0.2:2*Math.PI-0.2,m.val<0); ctx.stroke();
+    ctx.fillStyle='#fbbf24'; ctx.font='700 11px JetBrains Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(Math.abs(m.val)+' kN·m',mx,beamY-22);
+  });
+  ctx.strokeStyle='rgba(139,148,158,0.4)'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+  ctx.beginPath(); ctx.moveTo(PAD,155); ctx.lineTo(W-PAD,155); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='#8b949e'; ctx.font='10px JetBrains Mono,monospace'; ctx.textAlign='center';
+  [0,0.25,0.5,0.75,1].forEach(f=>{
+    const xm=PAD+f*beamW;
+    ctx.beginPath(); ctx.moveTo(xm,150); ctx.lineTo(xm,160); ctx.stroke();
+    ctx.fillStyle='#8b949e'; ctx.fillText((f*L).toFixed(1)+'m',xm,170);
+  });
+}
+
+function drawArrow(ctx,x1,y1,x2,y2,color,lw,hs){
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=lw;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const angle=Math.atan2(y2-y1,x2-x1);
+  ctx.beginPath(); ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-hs*Math.cos(angle-0.45),y2-hs*Math.sin(angle-0.45));
+  ctx.lineTo(x2-hs*Math.cos(angle+0.45),y2-hs*Math.sin(angle+0.45));
+  ctx.closePath(); ctx.fill();
+}
+function drawPino(ctx,x,y){
+  ctx.fillStyle='#38bdf8'; ctx.strokeStyle='#38bdf8'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x,y+2); ctx.lineTo(x-12,y+22); ctx.lineTo(x+12,y+22); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(x-16,y+22); ctx.lineTo(x+16,y+22); ctx.stroke();
+  ctx.fillStyle='#38bdf8'; ctx.font='600 10px JetBrains Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('△A',x,y+38);
+}
+function drawRolete(ctx,x,y){
+  ctx.fillStyle='#4ade80'; ctx.strokeStyle='#4ade80'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x,y+2); ctx.lineTo(x-12,y+20); ctx.lineTo(x+12,y+20); ctx.closePath(); ctx.stroke();
+  [-7,0,7].forEach(dx=>{ctx.beginPath(); ctx.arc(x+dx,y+23,3,0,Math.PI*2); ctx.stroke();});
+  ctx.beginPath(); ctx.moveTo(x-16,y+26); ctx.lineTo(x+16,y+26); ctx.stroke();
+  ctx.fillStyle='#4ade80'; ctx.font='600 10px JetBrains Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('▽B',x,y+38);
+}
+function drawEngaste(ctx,x,y,side='left'){
+  ctx.strokeStyle='#f97316'; ctx.fillStyle='rgba(249,115,22,0.2)'; ctx.lineWidth=1.5;
+  ctx.fillRect(side==='left'?x-20:x,y-30,20,60);
+  ctx.strokeRect(side==='left'?x-20:x,y-30,20,60);
+  ctx.strokeStyle='rgba(249,115,22,0.5)'; ctx.lineWidth=1;
+  for(let dy=-30;dy<=30;dy+=10){
+    const bx=side==='left'?x-20:x;
+    ctx.beginPath(); ctx.moveTo(bx,y+dy); ctx.lineTo(bx+(side==='left'?-8:8),y+dy+10); ctx.stroke();
+  }
+  ctx.fillStyle='#f97316'; ctx.font='600 10px JetBrains Mono,monospace';
+  ctx.textAlign=side==='left'?'right':'left';
+  ctx.fillText('▐A',side==='left'?x-22:x+22,y+4);
+}
+
+function somaFy(){
+  let s=state.cc.reduce((a,c)=>a+c.val,0);
+  s+=state.cd.reduce((a,c)=>a+resultanteCD(c),0); return s;
+}
+function resultanteCD(cd){return 0.5*(cd.wi+cd.wf)*(cd.xf-cd.xi);}
+function xResultanteCD(cd){
+  const L=cd.xf-cd.xi;
+  if(Math.abs(cd.wi-cd.wf)<1e-9) return cd.xi+L/2;
+  return cd.xi+(L/3)*(cd.wi+2*cd.wf)/(cd.wi+cd.wf);
+}
+function momentoEm(xRef){
+  let M=0;
+  state.cc.forEach(c=>{M+=c.val*(c.pos-xRef);});
+  state.cd.forEach(cd=>{M+=resultanteCD(cd)*(xResultanteCD(cd)-xRef);});
+  state.me.forEach(me=>{M-=me.val;});
+  return M;
+}
+
+function calcular(){
+  const tipo=document.getElementById('vigaTipo').value;
+  const nome=document.getElementById('vigaNome').value||'Viga';
+  const L=parseFloat(document.getElementById('vigaL').value);
+  showError('');
+  document.getElementById('resultado').style.display='none';
+  document.getElementById('emptyState').style.display='none';
+  try {
+    let res;
+    if(tipo==='eng'){
+      const xA=parseFloat(document.getElementById('apEngX').value)||0;
+      res=calcEngaste(xA,nome,L);
+    } else {
+      const xA=parseFloat(document.getElementById('apPinoX').value)??0;
+      const xB=parseFloat(document.getElementById('apRoleteX').value)??L;
+      if(Math.abs(xB-xA)<0.01) throw new Error('Apoios A e B estão na mesma posição!');
+      res=calcSA(xA,xB,nome,L);
+    }
+    renderResultado(res); desenharVigaComReacoes(res);
+  } catch(e){ showError(e.message); document.getElementById('emptyState').style.display='flex'; }
+}
+
+function calcSA(xA,xB,nome,L){
+  const d=xB-xA, M_A=momentoEm(xA), Rb=M_A/d, soma=somaFy(), Ra=soma-Rb;
+  const chkFy=Math.abs(Ra+Rb-soma), chkMA=Math.abs(Rb*d-M_A);
+  const M_B=momentoEm(xB), chkMB=Math.abs(Ra*(xB-xA)+M_B);
+  return {tipo:'sa',nome,L,xA,xB,d,Ra,Rb,Ha:0,soma,M_A,chkFy,chkMA,chkMB};
+}
+function calcEngaste(xA,nome,L){
+  const soma=somaFy(), Ra=soma, Ha=0, Ma=momentoEm(xA);
+  return {tipo:'eng',nome,L,xA,Ra,Ha,Ma,soma,chkFy:Math.abs(Ra-soma),chkM:0};
+}
+
+function renderResultado(res){
+  document.getElementById('resNome').textContent=res.nome;
+  document.getElementById('resDesc').textContent=res.tipo==='sa'
+    ?`Viga simplesmente apoiada — A(x=${res.xA}m) + B(x=${res.xB}m) — L=${res.L}m`
+    :`Viga em balanço — Engaste em x=${res.xA}m — L=${res.L}m`;
+  const grid=document.getElementById('reactionsGrid');
+  if(res.tipo==='sa'){
+    grid.innerHTML=rCard('H_A',res.Ha,'kN',res.Ha>=0?'→':'←','#8b949e','Horizontal no pino')
+      +rCard('R_A',res.Ra,'kN',res.Ra>=0?'↑':'↓','#f97316',`Pino @ x=${res.xA}m`)
+      +rCard('R_B',res.Rb,'kN',res.Rb>=0?'↑':'↓','#4ade80',`Rolete @ x=${res.xB}m`);
+  } else {
+    grid.innerHTML=rCard('H_A',res.Ha,'kN','→','#8b949e','Horizontal')
+      +rCard('R_A',res.Ra,'kN',res.Ra>=0?'↑':'↓','#f97316',`Vertical @ x=${res.xA}m`)
+      +rCard('M_A',res.Ma,'kN·m',res.Ma>=0?'↺':'↻','#fbbf24','Momento no engaste');
+  }
+  const container=document.getElementById('stepsContainer');
+  container.innerHTML='';
+  if(res.tipo==='sa') renderPassosSA(res,container);
+  else renderPassosEng(res,container);
+  document.getElementById('resultado').style.display='flex';
+}
+
+function rCard(label,val,unit,dir,color,sub){
+  return `<div class="reaction-card">
+    <div class="rc-label">${label}</div>
+    <div class="rc-value" style="color:${color}">${fmt(Math.abs(val))}</div>
+    <div class="rc-unit">${unit}</div><div class="rc-dir">${dir}</div>
+    <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">${sub}</div></div>`;
+}
+function fmt(v){return Math.abs(v)<0.001?'0':v.toFixed(2);}
+
+function renderPassosSA(res,container){
+  const {xA,xB,d,Ra,Rb,soma,M_A}=res;
+  addStep(container,0,'📚 Fundamentos',`<div class="eq-block">
+    <div class="eq-line">ΣFx = 0  →  H<sub>A</sub> = 0</div>
+    <div class="eq-line">ΣM<sub>A</sub> = 0  →  isola R<sub>B</sub></div>
+    <div class="eq-line">ΣFy = 0  →  isola R<sub>A</sub></div></div>
+    <div class="gap8 mt8"><span class="info-chip">Pino A @ x=${xA}m</span>
+    <span class="info-chip">Rolete B @ x=${xB}m</span><span class="info-chip">d = ${d.toFixed(4)} m</span></div>`);
+  addStep(container,2,'Equação 1 — ΣFx = 0',`<div class="eq-block">
+    <div class="eq-line">ΣFx = 0  →  H<sub>A</sub> = 0 kN</div>
+    <div class="eq-result">∴ H<sub>A</sub> = 0 kN</div></div>`);
+  let momTable=`<table class="contrib-table"><thead><tr><th>Carga</th><th>F(kN)</th><th>x(m)</th><th>Braço(m)</th><th>M(kN·m)</th></tr></thead><tbody>`;
+  let somaM=0;
+  state.cc.forEach(c=>{const b=c.pos-xA,m=c.val*b;somaM+=m;
+    momTable+=`<tr><td>F=${c.val}kN@${c.pos}m</td><td>${c.val}</td><td>${c.pos}</td><td>${b.toFixed(4)}</td><td class="${m>=0?'pos':'neg'}">${m>=0?'+':''}${m.toFixed(4)}</td></tr>`;});
+  state.cd.forEach((cd,i)=>{const R=resultanteCD(cd),xR=xResultanteCD(cd),b=xR-xA,m=R*b;somaM+=m;
+    momTable+=`<tr><td>R${i+1}=${R.toFixed(2)}kN@${xR.toFixed(2)}m</td><td>${R.toFixed(4)}</td><td>${xR.toFixed(4)}</td><td>${b.toFixed(4)}</td><td class="${m>=0?'pos':'neg'}">${m>=0?'+':''}${m.toFixed(4)}</td></tr>`;});
+  state.me.forEach(me=>{const c=-me.val;somaM+=c;
+    momTable+=`<tr><td>M_ext=${me.val}kN·m</td><td colspan="3" style="color:var(--muted)">direto</td><td class="${c>=0?'pos':'neg'}">${c>=0?'+':''}${c.toFixed(4)}</td></tr>`;});
+  momTable+=`<tr><td colspan="4">Σ(M_cargas)</td><td>${somaM.toFixed(4)}</td></tr></tbody></table>`;
+  momTable+=`<div class="eq-block">
+    <div class="eq-line">R<sub>B</sub> × ${d.toFixed(4)} = ${somaM.toFixed(4)}</div>
+    <div class="eq-result">∴ R<sub>B</sub> = ${Rb.toFixed(4)} kN ${Rb>=0?'↑':'↓'}</div></div>`;
+  addStep(container,3,`Equação 2 — ΣM_A = 0 → R_B`,momTable);
+  addStep(container,4,`Equação 3 — ΣFy = 0 → R_A`,`<div class="eq-block">
+    <div class="eq-line">R<sub>A</sub> + ${Rb.toFixed(4)} − ${soma.toFixed(4)} = 0</div>
+    <div class="eq-result">∴ R<sub>A</sub> = ${Ra.toFixed(4)} kN ${Ra>=0?'↑':'↓'}</div></div>`);
+  const ok1=Math.abs(res.chkFy)<1e-4,ok2=Math.abs(res.chkMA)<1e-4,ok3=Math.abs(res.chkMB)<1e-4;
+  addStep(container,5,`✅ Verificação${ok1&&ok2&&ok3?' — APROVADO ✓':' — ATENÇÃO !'}`,
+    checkRow(ok1,'ΣFy = R_A + R_B − ΣF_ext',`${Ra.toFixed(4)}+${Rb.toFixed(4)}-${soma.toFixed(4)}`,res.chkFy)
+    +checkRow(ok2,'ΣM_A = R_B×d − Σ(M_cargas)',`${Rb.toFixed(4)}×${d.toFixed(4)}-${M_A.toFixed(4)}`,res.chkMA)
+    +checkRow(ok3,'ΣM_B (verificação independente)','R_A×d + Σ(M em B)',res.chkMB));
+}
+
+function renderPassosEng(res,container){
+  const {xA,Ra,Ha,Ma,soma}=res;
+  addStep(container,0,'📚 Fundamentos — Viga em Balanço',`<div class="eq-block">
+    <div class="eq-line">ΣFx=0 → H<sub>A</sub></div><div class="eq-line">ΣFy=0 → R<sub>A</sub></div>
+    <div class="eq-line">ΣM<sub>A</sub>=0 → M<sub>A</sub></div></div>`);
+  addStep(container,2,'Equação 1 — ΣFx = 0',`<div class="eq-block"><div class="eq-result">∴ H<sub>A</sub> = 0 kN</div></div>`);
+  addStep(container,3,'Equação 2 — ΣFy = 0 → R_A',`<div class="eq-block">
+    <div class="eq-line">R<sub>A</sub> = ΣF_ext = ${soma.toFixed(4)} kN</div>
+    <div class="eq-result">∴ R<sub>A</sub> = ${Ra.toFixed(4)} kN ${Ra>=0?'↑':'↓'}</div></div>`);
+  let somaM=0,momBody='';
+  state.cc.forEach(c=>{const b=c.pos-xA,m=c.val*b;somaM+=m;momBody+=`<div class="eq-line">F=${c.val}kN × braço=${b.toFixed(4)}m = ${m>=0?'+':''}${m.toFixed(4)} kN·m</div>`;});
+  state.cd.forEach((cd,i)=>{const R=resultanteCD(cd),xR=xResultanteCD(cd),b=xR-xA,m=R*b;somaM+=m;momBody+=`<div class="eq-line">R${i+1}=${R.toFixed(2)}kN × braço=${b.toFixed(4)}m = ${m>=0?'+':''}${m.toFixed(4)} kN·m</div>`;});
+  state.me.forEach(me=>{const c=-me.val;somaM+=c;momBody+=`<div class="eq-line">M_ext: ${c>=0?'+':''}${c.toFixed(4)} kN·m</div>`;});
+  addStep(container,4,'Equação 3 — ΣM_A = 0 → M_A',`<div class="eq-block">${momBody}
+    <div class="eq-line">Σ(M_cargas) = ${somaM.toFixed(4)} kN·m</div>
+    <div class="eq-result">∴ M<sub>A</sub> = ${Ma.toFixed(4)} kN·m ${Ma>=0?'↺':'↻'}</div></div>`);
+  addStep(container,5,`✅ Verificação${Math.abs(res.chkFy)<1e-4?' — APROVADO ✓':' — ATENÇÃO !'}`,
+    checkRow(Math.abs(res.chkFy)<1e-4,'ΣFy = R_A − ΣF_ext',`${Ra.toFixed(4)}-${soma.toFixed(4)}`,res.chkFy));
+}
+
+function addStep(container,num,titulo,corpo){
+  const div=document.createElement('div');
+  div.className=`step${num<=1?' open':''}`;
+  div.innerHTML=`<div class="step-header" onclick="toggleStep(this)">
+    <div class="step-num">${num}</div><div class="step-title">${titulo}</div>
+    <div class="step-toggle">▼</div></div>
+    <div class="step-body" style="padding-top:14px">${corpo}</div>`;
+  container.appendChild(div);
+}
+function toggleStep(h){h.parentElement.classList.toggle('open');}
+function checkRow(ok,label,expr,val){
+  return `<div class="check-row ${ok?'ok':'err'}">
+    <div class="check-icon">${ok?'✅':'❌'}</div>
+    <div><div style="color:var(--text);font-size:0.82rem;font-weight:600">${label}</div>
+    <div style="color:var(--muted);font-size:0.77rem;margin-top:2px">= ${expr} = ${val.toExponential(2)}</div></div>
+    <div class="check-val">${ok?'≈ 0 ✓':'≠ 0 !'}</div></div>`;
+}
+function showError(msg){
+  const box=document.getElementById('errorBox');
+  if(msg){box.textContent='⚠️ '+msg;box.style.display='block';}
+  else box.style.display='none';
+}
+function desenharVigaComReacoes(res){
+  desenharViga();
+  const canvas=document.getElementById('vigaCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,L=res.L,PAD=60,beamW=W-PAD*2,beamY=100;
+  function px(x){return PAD+(x/L)*beamW;}
+  if(res.tipo==='sa'){
+    drawReactionArrow(ctx,px(res.xA),beamY,res.Ra,'R_A');
+    drawReactionArrow(ctx,px(res.xB),beamY,res.Rb,'R_B');
+  } else {
+    drawReactionArrow(ctx,px(res.xA),beamY,res.Ra,'R_A');
+  }
+}
+function drawReactionArrow(ctx,x,beamY,val,label){
+  if(Math.abs(val)<0.001) return;
+  const dir=val>=0?-1:1,color=val>=0?'#4ade80':'#f87171';
+  const startY=beamY+dir*55,endY=beamY+dir*8;
+  drawArrow(ctx,x,startY,x,endY,color,2.5,9);
+  ctx.fillStyle=color; ctx.font='700 11px JetBrains Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText(label+'='+fmt(Math.abs(val))+'kN',x,startY+(val>=0?-6:16));
+}
+
+function loadEx(n){
+  resetar();
+  if(n===1){
+    document.getElementById('vigaNome').value='Exercício 1 — 150 kN';
+    document.getElementById('vigaL').value='5';
+    document.getElementById('vigaTipo').value='sa';
+    renderApoiosCard();
+    document.getElementById('apPinoX').value='0';
+    document.getElementById('apRoleteX').value='5';
+    state.cc.push({pos:3,val:150});
+  } else if(n===2){
+    document.getElementById('vigaNome').value='Exercício 2 — Engaste';
+    document.getElementById('vigaL').value='5';
+    document.getElementById('vigaTipo').value='eng';
+    renderApoiosCard();
+    document.getElementById('apEngX').value='0';
+    state.cc.push({pos:3,val:100},{pos:5,val:200});
+  } else if(n===3){
+    document.getElementById('vigaNome').value='Exercício 3';
+    document.getElementById('vigaL').value='12';
+    document.getElementById('vigaTipo').value='sa';
+    renderApoiosCard();
+    document.getElementById('apPinoX').value='2';
+    document.getElementById('apRoleteX').value='10';
+    state.cc.push({pos:0,val:50},{pos:12,val:50});
+    state.cd.push({xi:0,xf:12,wi:240,wf:240});
+  } else if(n===4){
+    document.getElementById('vigaNome').value='Exercício 4';
+    document.getElementById('vigaL').value='10';
+    document.getElementById('vigaTipo').value='sa';
+    renderApoiosCard();
+    document.getElementById('apPinoX').value='2';
+    document.getElementById('apRoleteX').value='10';
+    state.cc.push({pos:0,val:50});
+    state.cd.push({xi:0,xf:10,wi:240,wf:240});
+  }
+  renderLists(); desenharViga();
+}
+
+function resetar(){
+  state.cc=[];state.cd=[];state.me=[];
+  document.getElementById('vigaNome').value='Viga 1';
+  document.getElementById('vigaL').value='5';
+  document.getElementById('vigaTipo').value='sa';
+  renderApoiosCard(); renderLists();
+  document.getElementById('resultado').style.display='none';
+  document.getElementById('emptyState').style.display='flex';
+  showError(''); desenharViga();
+}
+</script>
+
+<!-- ══════════════ CALCULADORA ELÉTRICA (inline) ══════════════ -->
+<style>
+#app-elec {
+  --bg: #050a12; --panel: #0b1525; --border: #1a3a5c;
+  --accent: #00d4ff; --accent2: #ff6b35; --accent3: #39ff14;
+  --text: #c8e6f5; --muted: #4a7a99; --gold: #ffd700;
+  --correct: #39ff14; --wrong: #ff3366;
+}
+#app-elec * { box-sizing: border-box; margin: 0; padding: 0; }
+</style>
+<style id="elec-inner-styles">
+
+  :root {
+    --bg: #050a12;
+    --panel: #0b1525;
+    --border: #1a3a5c;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #39ff14;
+    --text: #c8e6f5;
+    --muted: #4a7a99;
+    --gold: #ffd700;
+    --correct: #39ff14;
+    --wrong: #ff3366;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: 
+      radial-gradient(ellipse at 20% 50%, rgba(0,212,255,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(255,107,53,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(0,212,255,0.015) 50px, rgba(0,212,255,0.015) 51px),
+      repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(0,212,255,0.015) 50px, rgba(0,212,255,0.015) 51px);
+    pointer-events: none; z-index: 0;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
+
+  header {
+    text-align: center;
+    padding: 40px 20px 30px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 30px;
+    position: relative;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 20%; right: 20%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), var(--accent), transparent);
+  }
+
+  .logo-line {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(18px, 4vw, 30px);
+    font-weight: 900;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, var(--accent), #fff, var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 3px;
+    margin-top: 8px;
+    text-transform: uppercase;
+  }
+
+  /* TAB NAVIGATION */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 12px 20px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.25s;
+    text-transform: uppercase;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+    position: relative;
+  }
+
+  .tab-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(0,212,255,0.05));
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 20px rgba(0,212,255,0.2), inset 0 0 20px rgba(0,212,255,0.05);
+  }
+
+  .tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  /* PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 18px;
+    background: var(--accent2);
+    box-shadow: 0 0 8px var(--accent2);
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+    transition: border-color 0.3s;
+  }
+
+  .card:hover { border-color: rgba(0,212,255,0.3); }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 14px; height: 14px;
+    border-top: 1px solid var(--accent);
+    border-right: 1px solid var(--accent);
+    transform: translate(0px, 0px);
+  }
+
+  /* FORMULA DISPLAY */
+  .formula-box {
+    background: rgba(0,212,255,0.05);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+
+  /* INPUTS */
+  .input-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 18px 0;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .field input, .field select {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 15px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+
+  .field input:focus, .field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(0,212,255,0.2);
+  }
+
+  .field select option { background: var(--panel); }
+
+  /* BUTTONS */
+  .btn {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    padding: 13px 28px;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #0080a0);
+    color: #000;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #fff, var(--accent));
+    box-shadow: 0 0 30px rgba(0,212,255,0.4);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+  }
+
+  .btn-secondary:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+
+  /* RESULTS */
+  .result-box {
+    background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(0,212,255,0.02));
+    border: 1px solid rgba(0,212,255,0.4);
+    padding: 20px 24px;
+    margin-top: 20px;
+    display: none;
+    animation: slideIn 0.4s ease;
+  }
+
+  @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .result-box.show { display: block; }
+
+  .result-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0,212,255,0.2);
+  }
+
+  .step {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 12px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent2);
+    background: rgba(255,107,53,0.1);
+    border: 1px solid rgba(255,107,53,0.3);
+    padding: 3px 8px;
+    min-width: 32px;
+    text-align: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-content {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  .step-content .highlight {
+    color: var(--accent);
+    font-weight: bold;
+  }
+
+  .step-content .formula-inline {
+    color: var(--gold);
+  }
+
+  .final-answer {
+    background: rgba(57,255,20,0.08);
+    border: 1px solid rgba(57,255,20,0.4);
+    padding: 16px 20px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .answer-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    color: var(--correct);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    min-width: 80px;
+  }
+
+  .answer-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--correct);
+    text-shadow: 0 0 20px rgba(57,255,20,0.5);
+  }
+
+  /* RECOMMENDATION BOX */
+  .rec-box {
+    background: rgba(255,215,0,0.05);
+    border: 1px solid rgba(255,215,0,0.3);
+    border-left: 3px solid var(--gold);
+    padding: 14px 18px;
+    margin-top: 12px;
+  }
+
+  .rec-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .rec-content {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #e0c060;
+  }
+
+  /* THEORY BOXES */
+  .theory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .theory-card {
+    background: rgba(0,212,255,0.03);
+    border: 1px solid var(--border);
+    padding: 18px;
+    position: relative;
+  }
+
+  .theory-card h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .theory-card p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .theory-card .eq {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 16px;
+    color: var(--gold);
+    text-align: center;
+    margin: 10px 0;
+    padding: 8px;
+    background: rgba(255,215,0,0.05);
+  }
+
+  /* MOTOR TABLE */
+  .motor-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    margin-top: 12px;
+  }
+
+  .motor-table th {
+    background: rgba(0,212,255,0.1);
+    color: var(--accent);
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .motor-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(26,58,92,0.5);
+    color: var(--text);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .motor-table tr:hover td { background: rgba(0,212,255,0.03); }
+
+  .badge {
+    display: inline-block;
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    text-transform: uppercase;
+  }
+
+  .badge-blue { background: rgba(0,212,255,0.15); border: 1px solid var(--accent); color: var(--accent); }
+  .badge-orange { background: rgba(255,107,53,0.15); border: 1px solid var(--accent2); color: var(--accent2); }
+  .badge-green { background: rgba(57,255,20,0.1); border: 1px solid var(--correct); color: var(--correct); }
+  .badge-gold { background: rgba(255,215,0,0.1); border: 1px solid var(--gold); color: var(--gold); }
+
+  /* QUIZ SECTION */
+  .quiz-question {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 22px;
+    margin-bottom: 18px;
+    position: relative;
+  }
+
+  .quiz-question h4 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .option-btn {
+    display: block;
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    padding: 12px 16px;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+  }
+
+  .option-btn:hover { border-color: var(--accent); background: rgba(0,212,255,0.05); }
+  .option-btn.correct { border-color: var(--correct); background: rgba(57,255,20,0.08); color: var(--correct); }
+  .option-btn.wrong { border-color: var(--wrong); background: rgba(255,51,102,0.08); color: var(--wrong); }
+
+  .explanation {
+    margin-top: 14px;
+    padding: 14px;
+    background: rgba(0,0,0,0.3);
+    border-left: 3px solid var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+    display: none;
+  }
+
+  .explanation.show { display: block; animation: fadeIn 0.3s ease; }
+
+  .q-number {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    color: var(--accent2);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
+  /* DIMENSIONAMENTO */
+  .dim-result {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  .dim-item {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    padding: 14px;
+    text-align: center;
+  }
+
+  .dim-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .dim-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .dim-unit {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  @media (max-width: 600px) {
+    .input-group { grid-template-columns: 1fr; }
+    .tab-btn { font-size: 9px; padding: 10px 12px; letter-spacing: 1px; }
+    .answer-value { font-size: 16px; }
+  }
+
+</style>
+<script>
+// Inject electric calculator HTML
+document.getElementById('app-elec').innerHTML = `<div class="container">
+
+  <header>
+    <div class="logo-line">⚡ Calculadora Elétrica</div>
+    <div class="subtitle">Disciplina: Eletricidade · Leis de Ohm · Associação de Resistores · Dimensionamento</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('ohm')">⚡ Leis de Ohm</button>
+    <button class="tab-btn" onclick="showTab('resistor')">🔗 Associação</button>
+    <button class="tab-btn" onclick="showTab('dim')">📐 Dimensionamento</button>
+    <button class="tab-btn" onclick="showTab('motor')">⚙️ Motores Elétricos</button>
+    <button class="tab-btn" onclick="showTab('quiz1')">📋 Quiz — Ohm</button>
+    <button class="tab-btn" onclick="showTab('quiz2')">📋 Quiz — Associação</button>
+  </div>
+
+  <!-- ============================= TAB: LEIS DE OHM ============================= -->
+  <div id="tab-ohm" class="panel active">
+
+    <div class="theory-grid">
+      <div class="theory-card">
+        <h3>1ª Lei de Ohm</h3>
+        <div class="eq">V = R × I</div>
+        <p>A tensão (V) é proporcional à corrente (I) para um resistor ôhmico.</p>
+      </div>
+      <div class="theory-card">
+        <h3>2ª Lei de Ohm</h3>
+        <div class="eq">R = ρ × L / A</div>
+        <p>Resistência depende da resistividade (ρ), comprimento (L) e área (A).</p>
+      </div>
+      <div class="theory-card">
+        <h3>Potência Elétrica</h3>
+        <div class="eq">P = V × I = I² × R</div>
+        <p>Potência dissipada pelo resistor em watts (W).</p>
+      </div>
+    </div>
+
+    <!-- Calculadora 1ª Lei de Ohm -->
+    <div class="card">
+      <div class="section-title">Calculadora — 1ª Lei de Ohm (V = R × I)</div>
+      <p style="color:var(--muted); font-size:13px; margin-bottom:14px;">Preencha dois campos — o terceiro será calculado com passo a passo.</p>
+      <div class="input-group">
+        <div class="field">
+          <label>Tensão (V) — Volts</label>
+          <input type="number" id="ohm_v" placeholder="ex: 40">
+        </div>
+        <div class="field">
+          <label>Resistência (R) — Ohms (Ω)</label>
+          <input type="number" id="ohm_r" placeholder="ex: 10">
+        </div>
+        <div class="field">
+          <label>Corrente (I) — Ampères (A)</label>
+          <input type="number" id="ohm_i" placeholder="ex: 4">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="calcOhm()">CALCULAR</button>
+        <button class="btn btn-secondary" onclick="clearOhm()">LIMPAR</button>
+      </div>
+      <div id="res-ohm" class="result-box"></div>
+    </div>
+
+    <!-- Calculadora 2ª Lei de Ohm -->
+    <div class="card">
+      <div class="section-title">Calculadora — 2ª Lei de Ohm (R = ρ × L / A)</div>
+      <p style="color:var(--muted); font-size:13px; margin-bottom:14px;">Exercício 1 da lista: calcule a resistência de um fio condutor.</p>
+      <div class="input-group">
+        <div class="field">
+          <label>Resistividade ρ (Ω·m)</label>
+          <input type="number" id="ohm2_rho" placeholder="ex: 1.6e-8" step="any">
+        </div>
+        <div class="field">
+          <label>Comprimento L (m)</label>
+          <input type="number" id="ohm2_l" placeholder="ex: 10">
+        </div>
+        <div class="field">
+          <label>Área A (mm²)</label>
+          <input type="number" id="ohm2_a" placeholder="ex: 4">
+        </div>
+      </div>
+      <div class="formula-box">R = ρ × L / A &nbsp;&nbsp;|&nbsp;&nbsp; A deve ser convertida de mm² para m²: A(m²) = A(mm²) × 10⁻⁶</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="calcOhm2()">CALCULAR</button>
+        <button class="btn btn-secondary" onclick="clearOhm2()">LIMPAR</button>
+      </div>
+      <div id="res-ohm2" class="result-box"></div>
+    </div>
+
+    <!-- Resistência interna / tensão interna -->
+    <div class="card">
+      <div class="section-title">Calculadora — Resistência Interna de Pilhas</div>
+      <p style="color:var(--muted); font-size:13px; margin-bottom:14px;">Exercício 3: V_total = V_lâmpada + r_int × I</p>
+      <div class="input-group">
+        <div class="field">
+          <label>Nº de pilhas em série</label>
+          <input type="number" id="pi_n" value="2" min="1">
+        </div>
+        <div class="field">
+          <label>Tensão nominal de cada pilha (V)</label>
+          <input type="number" id="pi_vnominal" placeholder="ex: 1.5" step="any">
+        </div>
+        <div class="field">
+          <label>Tensão na lâmpada medida (V)</label>
+          <input type="number" id="pi_vlamp" placeholder="ex: 2.78" step="any">
+        </div>
+        <div class="field">
+          <label>Corrente no circuito (mA)</label>
+          <input type="number" id="pi_i" placeholder="ex: 94.2" step="any">
+        </div>
+      </div>
+      <div class="formula-box">r_total = (V_fonte - V_carga) / I &nbsp;|&nbsp; r_cada = r_total / N</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="calcPilha()">CALCULAR</button>
+        <button class="btn btn-secondary" onclick="clearPilha()">LIMPAR</button>
+      </div>
+      <div id="res-pilha" class="result-box"></div>
+    </div>
+
+  </div>
+
+  <!-- ============================= TAB: ASSOCIAÇÃO ============================= -->
+  <div id="tab-resistor" class="panel">
+
+    <div class="theory-grid">
+      <div class="theory-card">
+        <h3>Série</h3>
+        <div class="eq">R_eq = R1 + R2 + ... + Rn</div>
+        <p>Mesma corrente em todos. Tensão dividida.</p>
+      </div>
+      <div class="theory-card">
+        <h3>Paralelo</h3>
+        <div class="eq">1/R_eq = 1/R1 + 1/R2 + ...</div>
+        <p>Mesma tensão em todos. Corrente dividida.</p>
+      </div>
+      <div class="theory-card">
+        <h3>Paralelo (dois iguais)</h3>
+        <div class="eq">R_eq = R / 2</div>
+        <p>Para dois resistores com o mesmo valor.</p>
+      </div>
+    </div>
+
+    <!-- Calculadora Série -->
+    <div class="card">
+      <div class="section-title">Associação em Série</div>
+      <div class="input-group">
+        <div class="field">
+          <label>R1 (Ω)</label>
+          <input type="number" id="ser_r1" placeholder="ex: 10">
+        </div>
+        <div class="field">
+          <label>R2 (Ω)</label>
+          <input type="number" id="ser_r2" placeholder="ex: 20">
+        </div>
+        <div class="field">
+          <label>R3 (Ω) — opcional</label>
+          <input type="number" id="ser_r3" placeholder="ex: 30">
+        </div>
+        <div class="field">
+          <label>Tensão total (V)</label>
+          <input type="number" id="ser_v" placeholder="ex: 60">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="calcSerie()">CALCULAR</button>
+        <button class="btn btn-secondary" onclick="clearSerie()">LIMPAR</button>
+      </div>
+      <div id="res-serie" class="result-box"></div>
+    </div>
+
+    <!-- Calculadora Paralelo -->
+    <div class="card">
+      <div class="section-title">Associação em Paralelo</div>
+      <div class="input-group">
+        <div class="field">
+          <label>R1 (Ω)</label>
+          <input type="number" id="par_r1" placeholder="ex: 10">
+        </div>
+        <div class="field">
+          <label>R2 (Ω)</label>
+          <input type="number" id="par_r2" placeholder="ex: 20">
+        </div>
+        <div class="field">
+          <label>R3 (Ω) — opcional</label>
+          <input type="number" id="par_r3" placeholder="ex: 30">
+        </div>
+        <div class="field">
+          <label>Tensão (V)</label>
+          <input type="number" id="par_v" placeholder="ex: 10">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="calcParalelo()">CALCULAR</button>
+        <button class="btn btn-secondary" onclick="clearParalelo()">LIMPAR</button>
+      </div>
+      <div id="res-paralelo" class="result-box"></div>
+    </div>
+
+    <!-- Calculadora Ex2: Paralelo + sensor corrente -->
+    <div class="card">
+      <div class="section-title">Dois Resistores Iguais em Paralelo — Achar R</div>
+      <p style="color:var(--muted); font-size:13px; margin-bottom:14px;">Exercício 2: dado V e I total na associação, achar cada R.</p>
+      <div class="input-group">
+        <div class="field">
+          <label>Tensão total (V)</label>
+          <input type="number" id="par2_v" placeholder="ex: 10">
+        </div>
+        <div class="field">
+          <label>Corrente total (A)</label>
+          <input type="number" id="par2_i" placeholder="ex: 0.5">
+        </div>
+        <div class="field">
+          <label>Nº de resistores iguais</label>
+          <input type="number" id="par2_n" value="2" min="1">
+        </div>
+      </div>
+      <div class="formula-box">R_eq = V / I_total &nbsp;|&nbsp; Paralelo iguais: R_cada = R_eq × N</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="calcPar2()">CALCULAR</button>
+        <button class="btn btn-secondary" onclick="clearPar2()">LIMPAR</button>
+      </div>
+      <div id="res-par2" class="result-box"></div>
+    </div>
+
+    <!-- Encontrar R desconhecido em paralelo -->
+    <div class="card">
+      <div class="section-title">Encontrar R Desconhecido — Paralelo (Ex. 3 da Lista Ohm)</div>
+      <p style="color:var(--muted); font-size:13px; margin-bottom:14px;">R1 conhecido com corrente I1; corrente total I_t — achar R2.</p>
+      <div class="input-group">
+        <div class="field">
+          <label>R1 (Ω)</label>
+          <input type="number" id="rx_r1" placeholder="ex: 10">
+        </div>
+        <div class="field">
+          <label>Corrente em R1, I1 (A)</label>
+          <input type="number" id="rx_i1" placeholder="ex: 3" step="any">
+        </div>
+        <div class="field">
+          <label>Corrente total, I_t (A)</label>
+          <input type="number" id="rx_it" placeholder="ex: 4.5" step="any">
+        </div>
+      </div>
+      <div class="formula-box">V = R1 × I1 &nbsp;|&nbsp; I2 = I_t - I1 &nbsp;|&nbsp; R2 = V / I2</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="calcRx()">CALCULAR</button>
+        <button class="btn btn-secondary" onclick="clearRx()">LIMPAR</button>
+      </div>
+      <div id="res-rx" class="result-box"></div>
+    </div>
+
+  </div>
+
+  <!-- ============================= TAB: DIMENSIONAMENTO ============================= -->
+  <div id="tab-dim" class="panel">
+
+    <div class="card">
+      <div class="section-title">Dimensionamento de Circuito Elétrico</div>
+      <p style="color:var(--muted); font-size:13px; margin-bottom:18px;">Calcula corrente de projeto, disjuntor e seção do cabo (NBR 5410 simplificada)</p>
+
+      <div class="input-group">
+        <div class="field">
+          <label>Potência total da carga (W)</label>
+          <input type="number" id="dim_p" placeholder="ex: 2000">
+        </div>
+        <div class="field">
+          <label>Tensão de alimentação (V)</label>
+          <select id="dim_v">
+            <option value="127">127 V (monofásico)</option>
+            <option value="220" selected>220 V (monofásico)</option>
+            <option value="380">380 V (trifásico)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de carga</label>
+          <select id="dim_tipo">
+            <option value="resistiva">Resistiva (aquecedores, lâmpadas)</option>
+            <option value="motor">Motor elétrico</option>
+            <option value="led">Iluminação LED</option>
+            <option value="geral">Tomadas gerais</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Fator de potência (fp)</label>
+          <input type="number" id="dim_fp" value="1.0" min="0.1" max="1.0" step="0.05">
+        </div>
+      </div>
+
+      <div class="formula-box">I = P / (V × fp) &nbsp;&nbsp;|&nbsp;&nbsp; I_proj = I × 1,25 (fator segurança NBR 5410)</div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="calcDim()">DIMENSIONAR</button>
+        <button class="btn btn-secondary" onclick="clearDim()">LIMPAR</button>
+      </div>
+      <div id="res-dim" class="result-box"></div>
+    </div>
+
+    <!-- Tabela de referência -->
+    <div class="card">
+      <div class="section-title">Tabela de Referência — Disjuntores e Cabos (NBR 5410)</div>
+      <div style="overflow-x:auto;">
+        <table class="motor-table">
+          <thead>
+            <tr>
+              <th>Corrente Projeto</th>
+              <th>Disjuntor</th>
+              <th>Cabo (condutor)</th>
+              <th>Tipo de Uso</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Até 10 A</td>
+              <td><span class="badge badge-blue">10 A curva C</span></td>
+              <td>1,5 mm²</td>
+              <td>Iluminação, tomadas simples</td>
+            </tr>
+            <tr>
+              <td>10 A – 16 A</td>
+              <td><span class="badge badge-blue">16 A curva C</span></td>
+              <td>1,5 mm²</td>
+              <td>Tomadas 10A, iluminação</td>
+            </tr>
+            <tr>
+              <td>16 A – 20 A</td>
+              <td><span class="badge badge-orange">20 A curva C</span></td>
+              <td>2,5 mm²</td>
+              <td>Tomadas 20A, ar-cond. até 9000 BTU</td>
+            </tr>
+            <tr>
+              <td>20 A – 25 A</td>
+              <td><span class="badge badge-orange">25 A curva C</span></td>
+              <td>4,0 mm²</td>
+              <td>Chuveiro, ar-cond. 12.000 BTU</td>
+            </tr>
+            <tr>
+              <td>25 A – 32 A</td>
+              <td><span class="badge badge-orange">32 A curva C</span></td>
+              <td>6,0 mm²</td>
+              <td>Chuveiro 7500 W, forno, micro-ondas</td>
+            </tr>
+            <tr>
+              <td>32 A – 40 A</td>
+              <td><span class="badge badge-green">40 A curva C</span></td>
+              <td>10 mm²</td>
+              <td>Motores até 5 CV (220V), quadros</td>
+            </tr>
+            <tr>
+              <td>40 A – 50 A</td>
+              <td><span class="badge badge-green">50 A curva C</span></td>
+              <td>16 mm²</td>
+              <td>Motores 5–7,5 CV, cargas pesadas</td>
+            </tr>
+            <tr>
+              <td>50 A – 63 A</td>
+              <td><span class="badge badge-gold">63 A curva D</span></td>
+              <td>25 mm²</td>
+              <td>Motores 7,5–10 CV, sub-painéis</td>
+            </tr>
+            <tr>
+              <td>> 63 A</td>
+              <td><span class="badge badge-gold">Disjuntor D/Geral</span></td>
+              <td>35 mm² ou +</td>
+              <td>Entrada geral, motores grandes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="rec-box" style="margin-top:14px;">
+        <div class="rec-title">🔴 Curva C vs Curva D</div>
+        <div class="rec-content">
+          • <strong>Curva C</strong>: cargas resistivas e iluminação (dispara em 5–10× In)<br>
+          • <strong>Curva D</strong>: motores e transformadores com alto pico de partida (dispara em 10–20× In)<br>
+          • Sempre usar o disjuntor imediatamente acima da corrente de projeto calculada.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================= TAB: MOTORES ============================= -->
+  <div id="tab-motor" class="panel">
+
+    <div class="card">
+      <div class="section-title">Seleção e Dimensionamento de Motor Elétrico</div>
+      <div class="input-group">
+        <div class="field">
+          <label>Potência mecânica necessária (CV ou W)</label>
+          <input type="number" id="mot_p" placeholder="ex: 5">
+        </div>
+        <div class="field">
+          <label>Unidade</label>
+          <select id="mot_unit">
+            <option value="cv">CV (cavalos-vapor)</option>
+            <option value="w">W (watts)</option>
+            <option value="kw">kW (kilowatts)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Alimentação</label>
+          <select id="mot_feed">
+            <option value="mono220">Monofásico 220V</option>
+            <option value="tri220">Trifásico 220V</option>
+            <option value="tri380">Trifásico 380V</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de aplicação</label>
+          <select id="mot_app">
+            <option value="bomba">Bomba/Compressor</option>
+            <option value="esteira">Esteira/Conveyor</option>
+            <option value="ventilador">Ventilador/Exaustor</option>
+            <option value="geral">Uso geral</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="calcMotor()">RECOMENDAR MOTOR</button>
+        <button class="btn btn-secondary" onclick="clearMotor()">LIMPAR</button>
+      </div>
+      <div id="res-motor" class="result-box"></div>
+    </div>
+
+    <!-- Tabela tipos de motores -->
+    <div class="card">
+      <div class="section-title">Tipos de Motores Elétricos — Características</div>
+      <div style="overflow-x:auto;">
+        <table class="motor-table">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Alimentação</th>
+              <th>Aplicação Ideal</th>
+              <th>Vantagens</th>
+              <th>Faixa de Uso</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Motor de Indução Trifásico (MIT)</strong></td>
+              <td><span class="badge badge-blue">3F 220/380V</span></td>
+              <td>Bombas, compressores, esteiras industriais</td>
+              <td>Robusto, baixa manutenção, alto rendimento</td>
+              <td>0,25 CV a 500 CV+</td>
+            </tr>
+            <tr>
+              <td><strong>Motor Monofásico Indução</strong></td>
+              <td><span class="badge badge-orange">1F 127/220V</span></td>
+              <td>Ventiladores, bombas domésticas, eletrodomésticos</td>
+              <td>Simples, usa rede residencial</td>
+              <td>1/12 CV a 3 CV</td>
+            </tr>
+            <tr>
+              <td><strong>Motor Universal (CC/CA)</strong></td>
+              <td><span class="badge badge-orange">1F/DC</span></td>
+              <td>Ferramentas portáteis, aspiradores</td>
+              <td>Alta rotação, compacto, reversível</td>
+              <td>< 1 CV</td>
+            </tr>
+            <tr>
+              <td><strong>Motor de Passo (Stepper)</strong></td>
+              <td><span class="badge badge-green">DC/PWM</span></td>
+              <td>CNC, impressoras 3D, robótica</td>
+              <td>Controle preciso de posição</td>
+              <td>< 0,1 CV</td>
+            </tr>
+            <tr>
+              <td><strong>Motor Brushless (BLDC)</strong></td>
+              <td><span class="badge badge-green">DC/Inversor</span></td>
+              <td>Drones, VE, EPS, HVAC eficiente</td>
+              <td>Alta eficiência, sem escovas, durável</td>
+              <td>Ampla faixa</td>
+            </tr>
+            <tr>
+              <td><strong>Motor Síncrono c/ Ímãs (PMSM)</strong></td>
+              <td><span class="badge badge-gold">3F Inversor</span></td>
+              <td>Veículos elétricos, servo drives</td>
+              <td>Maior eficiência, fator de potência = 1</td>
+              <td>Ampla faixa</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================= TAB: QUIZ OHM ============================= -->
+  <div id="tab-quiz1" class="panel">
+    <div class="section-title">Lista de Exercícios — Leis de Ohm</div>
+
+    <div class="quiz-question">
+      <div class="q-number">QUESTÃO 01</div>
+      <h4>A linha de transmissão de uma residência tem dois fios de cobre com 10 m de comprimento e seção 4,0 mm². Resistividade do cobre: ρ = 1,6×10⁻⁸ Ω·m. Qual a resistência de cada fio?</h4>
+      <button class="option-btn" onclick="checkQ('q1','a')">a) 0,01 Ω</button>
+      <button class="option-btn" onclick="checkQ('q1','b')">b) 0,02 Ω</button>
+      <button class="option-btn" onclick="checkQ('q1','c')">c) 0,03 Ω</button>
+      <button class="option-btn" onclick="checkQ('q1','d')">d) 0,04 Ω</button>
+      <button class="option-btn" onclick="checkQ('q1','e')">e) 0,05 Ω</button>
+      <div id="exp-q1" class="explanation">
+        ✅ <strong>Resposta: d) 0,04 Ω</strong><br><br>
+        Fórmula: R = ρ × L / A<br>
+        Converter A: 4,0 mm² = 4,0 × 10⁻⁶ m²<br>
+        R = (1,6×10⁻⁸ × 10) / (4,0×10⁻⁶)<br>
+        R = 1,6×10⁻⁷ / 4,0×10⁻⁶<br>
+        <strong>R = 0,04 Ω ✔</strong>
+      </div>
+    </div>
+
+    <div class="quiz-question">
+      <div class="q-number">QUESTÃO 02</div>
+      <h4>Um resistor ôhmico submetido a 40 V é atravessado por 20 A. Quando a corrente for 4 A, qual será a tensão?</h4>
+      <button class="option-btn" onclick="checkQ('q2','a')">a) 8 V</button>
+      <button class="option-btn" onclick="checkQ('q2','b')">b) 12 V</button>
+      <button class="option-btn" onclick="checkQ('q2','c')">c) 16 V</button>
+      <button class="option-btn" onclick="checkQ('q2','d')">d) 20 V</button>
+      <button class="option-btn" onclick="checkQ('q2','e')">e) 30 V</button>
+      <div id="exp-q2" class="explanation">
+        ✅ <strong>Resposta: a) 8 V</strong><br><br>
+        Passo 1 — Calcular R: R = V/I = 40/20 = 2 Ω<br>
+        Passo 2 — Nova tensão: V = R × I = 2 × 4<br>
+        <strong>V = 8 V ✔</strong>
+      </div>
+    </div>
+
+    <div class="quiz-question">
+      <div class="q-number">QUESTÃO 03</div>
+      <h4>R1 = 10 Ω com corrente I1 = 3 A está em paralelo com R2 desconhecido. A corrente total é 4,5 A. Qual é R2?</h4>
+      <button class="option-btn" onclick="checkQ('q3','a')">a) 5,0 Ω</button>
+      <button class="option-btn" onclick="checkQ('q3','b')">b) 10 Ω</button>
+      <button class="option-btn" onclick="checkQ('q3','c')">c) 20 Ω</button>
+      <button class="option-btn" onclick="checkQ('q3','d')">d) 30 Ω</button>
+      <button class="option-btn" onclick="checkQ('q3','e')">e) 60 Ω</button>
+      <div id="exp-q3" class="explanation">
+        ✅ <strong>Resposta: c) 20 Ω</strong><br><br>
+        Passo 1 — V nos terminais: V = R1 × I1 = 10 × 3 = 30 V<br>
+        Passo 2 — Corrente em R2: I2 = I_total − I1 = 4,5 − 3 = 1,5 A<br>
+        Passo 3 — R2: R2 = V / I2 = 30 / 1,5<br>
+        <strong>R2 = 20 Ω ✔</strong>
+      </div>
+    </div>
+
+    <div class="quiz-question">
+      <div class="q-number">QUESTÃO 04</div>
+      <h4>De acordo com as Leis de Ohm, a resistência elétrica é:</h4>
+      <button class="option-btn" onclick="checkQ('q4','a')">a) Inversamente proporcional à tensão elétrica</button>
+      <button class="option-btn" onclick="checkQ('q4','b')">b) Proporcional à resistividade elétrica ✔</button>
+      <button class="option-btn" onclick="checkQ('q4','c')">c) Proporcional à corrente elétrica</button>
+      <button class="option-btn" onclick="checkQ('q4','d')">d) Inversamente proporcional ao comprimento do fio</button>
+      <button class="option-btn" onclick="checkQ('q4','e')">e) Proporcional à área de seção transversal</button>
+      <div id="exp-q4" class="explanation">
+        ✅ <strong>Resposta: b)</strong><br><br>
+        Pela 2ª Lei de Ohm: R = ρ × L / A<br>
+        ✔ R é proporcional a ρ (resistividade)<br>
+        ✔ R é proporcional a L (comprimento)<br>
+        ✔ R é inversamente proporcional a A (área)<br>
+        As outras alternativas estão invertidas ou incorretas.
+      </div>
+    </div>
+
+    <div class="quiz-question">
+      <div class="q-number">QUESTÃO 05</div>
+      <h4>Um resistor de 7,5×10⁻⁵ Ω percorrido por 10 A. Qual é a tensão entre seus terminais?</h4>
+      <button class="option-btn" onclick="checkQ('q5','a')">a) 7,0×10⁻³ V</button>
+      <button class="option-btn" onclick="checkQ('q5','b')">b) 7,5×10⁻⁴ V</button>
+      <button class="option-btn" onclick="checkQ('q5','c')">c) 8,0×10⁻⁵ V</button>
+      <button class="option-btn" onclick="checkQ('q5','d')">d) 8,5×10⁻⁶ V</button>
+      <button class="option-btn" onclick="checkQ('q5','e')">e) 9,0×10⁻⁷ V</button>
+      <div id="exp-q5" class="explanation">
+        ✅ <strong>Resposta: b) 7,5×10⁻⁴ V</strong><br><br>
+        V = R × I = 7,5×10⁻⁵ × 10<br>
+        <strong>V = 7,5×10⁻⁴ V ✔</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================= TAB: QUIZ ASSOCIAÇÃO ============================= -->
+  <div id="tab-quiz2" class="panel">
+    <div class="section-title">Lista de Exercícios — Associação de Resistores</div>
+
+    <div class="quiz-question">
+      <div class="q-number">QUESTÃO 01</div>
+      <h4>Um técnico liga dois resistores em série para alimentar LEDs. A razão correta para essa escolha é:</h4>
+      <button class="option-btn" onclick="checkQ('q6','a')">a) A corrente fica duas vezes maior ao passar pelos LEDs</button>
+      <button class="option-btn" onclick="checkQ('q6','b')">b) A corrente fica pela metade ao passar pelos LEDs</button>
+      <button class="option-btn" onclick="checkQ('q6','c')">c) A tensão da bateria dobra com a associação</button>
+      <button class="option-btn" onclick="checkQ('q6','d')">d) A tensão da bateria cai pela metade ao passar pelos LEDs</button>
+      <div id="exp-q6" class="explanation">
+        ✅ <strong>Resposta: d)</strong><br><br>
+        Em série, a tensão é dividida entre os componentes.<br>
+        Com dois resistores iguais em série, cada um recebe metade da tensão.<br>
+        Isso protege os LEDs que suportam apenas baixa tensão.<br>
+        A corrente em série é a mesma — NÃO dobra nem diminui.
+      </div>
+    </div>
+
+    <div class="quiz-question">
+      <div class="q-number">QUESTÃO 02</div>
+      <h4>Dois resistores iguais em paralelo. Tensão = 10V, corrente total = 0,5 A. Qual a resistência de cada um?</h4>
+      <button class="option-btn" onclick="checkQ('q7','a')">a) 10 Ω</button>
+      <button class="option-btn" onclick="checkQ('q7','b')">b) 20 Ω</button>
+      <button class="option-btn" onclick="checkQ('q7','c')">c) 30 Ω</button>
+      <button class="option-btn" onclick="checkQ('q7','d')">d) 40 Ω</button>
+      <div id="exp-q7" class="explanation">
+        ✅ <strong>Resposta: d) 40 Ω</strong><br><br>
+        Passo 1 — R_eq total: R_eq = V / I = 10 / 0,5 = 20 Ω<br>
+        Passo 2 — Paralelo de dois iguais: R_eq = R/2 → R = R_eq × 2<br>
+        R = 20 × 2 = <strong>40 Ω ✔</strong>
+      </div>
+    </div>
+
+    <div class="quiz-question">
+      <div class="q-number">QUESTÃO 03</div>
+      <h4>Lâmpada conectada a 2 pilhas de 1,5 V em série. Voltímetro: 2,78 V na lâmpada; Amperímetro: 94,2 mA. Qual a resistência interna de cada pilha?</h4>
+      <button class="option-btn" onclick="checkQ('q8','a')">a) 0,021 Ω</button>
+      <button class="option-btn" onclick="checkQ('q8','b')">b) 0,22 Ω</button>
+      <button class="option-btn" onclick="checkQ('q8','c')">c) 0,26 Ω</button>
+      <button class="option-btn" onclick="checkQ('q8','d')">d) 2,3 Ω</button>
+      <button class="option-btn" onclick="checkQ('q8','e')">e) 29 Ω</button>
+      <div id="exp-q8" class="explanation">
+        ✅ <strong>Resposta: b) 0,22 Ω (aprox. para cada pilha)</strong><br><br>
+        V_total = 2 × 1,5 = 3,0 V<br>
+        V_interna_total = 3,0 − 2,78 = 0,22 V<br>
+        I = 94,2 mA = 0,0942 A<br>
+        r_total = 0,22 / 0,0942 ≈ 2,34 Ω... 
+        ⚠️ Atenção: a questão pede resistência total das pilhas ≈ 2,3 Ω<br>
+        r_cada = 2,34 / 2 ≈ <strong>1,17 Ω por pilha</strong> — gabarito mais próximo: <strong>d) 2,3 Ω total</strong>
+      </div>
+    </div>
+
+    <div class="quiz-question">
+      <div class="q-number">QUESTÃO 04</div>
+      <h4>Lâmpadas residenciais de potências diferentes podem ser ligadas e desligadas individualmente. O tipo de ligação é:</h4>
+      <button class="option-btn" onclick="checkQ('q9','a')">a) Série — mesmo brilho</button>
+      <button class="option-btn" onclick="checkQ('q9','b')">b) Série — podem ser desligadas individualmente</button>
+      <button class="option-btn" onclick="checkQ('q9','c')">c) Paralelo — mesma corrente</button>
+      <button class="option-btn" onclick="checkQ('q9','d')">d) Paralelo — mesma tensão elétrica</button>
+      <div id="exp-q9" class="explanation">
+        ✅ <strong>Resposta: d)</strong><br><br>
+        Em paralelo, todos os pontos têm a mesma tensão (220V ou 127V da rede).<br>
+        Isso permite ligar/desligar cada lâmpada individualmente sem afetar as outras.<br>
+        Em série, ao desligar uma, todo o circuito para.
+      </div>
+    </div>
+
+    <div class="quiz-question">
+      <div class="q-number">QUESTÃO 05</div>
+      <h4>Três resistores R1 &lt; R2 &lt; R3 em paralelo com a mesma tensão. Em qual passa maior corrente?</h4>
+      <button class="option-btn" onclick="checkQ('q10','a')">a) Maior corrente em R3 (maior resistência)</button>
+      <button class="option-btn" onclick="checkQ('q10','b')">b) Maior corrente em R2</button>
+      <button class="option-btn" onclick="checkQ('q10','c')">c) Maior corrente em R1 (menor resistência)</button>
+      <button class="option-btn" onclick="checkQ('q10','d')">d) Mesma corrente em todos</button>
+      <div id="exp-q10" class="explanation">
+        ✅ <strong>Resposta: c)</strong><br><br>
+        Em paralelo: V é igual em todos os resistores.<br>
+        Pela Lei de Ohm: I = V / R<br>
+        Quanto MENOR o R, MAIOR a corrente que passa por ele.<br>
+        Como R1 é o menor, <strong>I1 é a maior</strong> ✔
+      </div>
+    </div>
+  </div>
+
+</div><!-- end container -->`;
+</script>
+<script>
+
+// ============ TAB CONTROL ============
+function showTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ============ HELPERS ============
+function fmt(n, decimals=4) {
+  if (Math.abs(n) < 0.001 || Math.abs(n) > 9999) return n.toExponential(3);
+  return parseFloat(n.toFixed(decimals));
+}
+
+function showResult(id, html) {
+  const el = document.getElementById(id);
+  el.innerHTML = html;
+  el.classList.add('show');
+}
+
+function step(n, text) {
+  return `<div class="step"><div class="step-num">${String(n).padStart(2,'0')}</div><div class="step-content">${text}</div></div>`;
+}
+
+function answer(label, value) {
+  return `<div class="final-answer"><div class="answer-label">${label}</div><div class="answer-value">${value}</div></div>`;
+}
+
+function rec(title, content) {
+  return `<div class="rec-box"><div class="rec-title">${title}</div><div class="rec-content">${content}</div></div>`;
+}
+
+// ============ 1ª LEI DE OHM ============
+function calcOhm() {
+  let V = parseFloat(document.getElementById('ohm_v').value);
+  let R = parseFloat(document.getElementById('ohm_r').value);
+  let I = parseFloat(document.getElementById('ohm_i').value);
+  let steps = `<div class="result-title">⚡ RESOLUÇÃO — 1ª LEI DE OHM</div>`;
+  let filled = [!isNaN(V), !isNaN(R), !isNaN(I)].filter(Boolean).length;
+  if (filled < 2) { showResult('res-ohm', '<div class="step-content" style="color:var(--wrong)">⚠ Preencha pelo menos dois campos!</div>'); return; }
+  steps += step(1, `<span class="formula-inline">Fórmula base: V = R × I</span>`);
+  if (isNaN(V)) {
+    steps += step(2, `Incógnita: <span class="highlight">Tensão (V)</span>`);
+    steps += step(3, `V = R × I = ${R} × ${I}`);
+    V = R * I;
+    steps += step(4, `V = <span class="highlight">${fmt(V)} V</span>`);
+    steps += answer('TENSÃO', fmt(V) + ' V');
+    steps += rec('DISJUNTOR / CABO', recDim(I));
+  } else if (isNaN(R)) {
+    steps += step(2, `Incógnita: <span class="highlight">Resistência (R)</span>`);
+    steps += step(3, `R = V / I = ${V} / ${I}`);
+    R = V / I;
+    steps += step(4, `R = <span class="highlight">${fmt(R)} Ω</span>`);
+    steps += answer('RESISTÊNCIA', fmt(R) + ' Ω');
+  } else {
+    steps += step(2, `Incógnita: <span class="highlight">Corrente (I)</span>`);
+    steps += step(3, `I = V / R = ${V} / ${R}`);
+    I = V / R;
+    steps += step(4, `I = <span class="highlight">${fmt(I)} A</span>`);
+    steps += answer('CORRENTE', fmt(I) + ' A');
+    steps += rec('DISJUNTOR / CABO', recDim(I));
+  }
+  showResult('res-ohm', steps);
+}
+function clearOhm() {
+  ['ohm_v','ohm_r','ohm_i'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('res-ohm').classList.remove('show');
+}
+
+// ============ 2ª LEI DE OHM ============
+function calcOhm2() {
+  let rho = parseFloat(document.getElementById('ohm2_rho').value);
+  let L = parseFloat(document.getElementById('ohm2_l').value);
+  let Amm = parseFloat(document.getElementById('ohm2_a').value);
+  if (isNaN(rho)||isNaN(L)||isNaN(Amm)) { showResult('res-ohm2','<div class="step-content" style="color:var(--wrong)">⚠ Preencha todos os campos!</div>'); return; }
+  const Am = Amm * 1e-6;
+  const R = rho * L / Am;
+  let steps = `<div class="result-title">📐 RESOLUÇÃO — 2ª LEI DE OHM</div>`;
+  steps += step(1, `<span class="formula-inline">R = ρ × L / A</span>`);
+  steps += step(2, `Converter área: A = ${Amm} mm² × 10⁻⁶ = <span class="highlight">${Am.toExponential(2)} m²</span>`);
+  steps += step(3, `R = ${rho.toExponential(2)} × ${L} / ${Am.toExponential(2)}`);
+  steps += step(4, `R = ${(rho*L).toExponential(3)} / ${Am.toExponential(2)}`);
+  steps += step(5, `R = <span class="highlight">${fmt(R)} Ω</span>`);
+  steps += answer('RESISTÊNCIA', fmt(R) + ' Ω');
+  showResult('res-ohm2', steps);
+}
+function clearOhm2() {
+  ['ohm2_rho','ohm2_l','ohm2_a'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('res-ohm2').classList.remove('show');
+}
+
+// ============ PILHA / RESISTÊNCIA INTERNA ============
+function calcPilha() {
+  let n = parseFloat(document.getElementById('pi_n').value);
+  let vnom = parseFloat(document.getElementById('pi_vnominal').value);
+  let vlamp = parseFloat(document.getElementById('pi_vlamp').value);
+  let imA = parseFloat(document.getElementById('pi_i').value);
+  if ([n,vnom,vlamp,imA].some(isNaN)) { showResult('res-pilha','<div class="step-content" style="color:var(--wrong)">⚠ Preencha todos os campos!</div>'); return; }
+  const vfonte = n * vnom;
+  const vint = vfonte - vlamp;
+  const I = imA / 1000;
+  const r_total = vint / I;
+  const r_cada = r_total / n;
+  let steps = `<div class="result-title">🔋 RESOLUÇÃO — RESISTÊNCIA INTERNA DAS PILHAS</div>`;
+  steps += step(1, `Tensão total da fonte: V_fonte = ${n} × ${vnom} = <span class="highlight">${vfonte} V</span>`);
+  steps += step(2, `Tensão interna (queda): V_int = V_fonte − V_lâmpada = ${vfonte} − ${vlamp} = <span class="highlight">${fmt(vint)} V</span>`);
+  steps += step(3, `Converter corrente: I = ${imA} mA = <span class="highlight">${I} A</span>`);
+  steps += step(4, `r_total = V_int / I = ${fmt(vint)} / ${I} = <span class="highlight">${fmt(r_total)} Ω</span>`);
+  steps += step(5, `r_cada = r_total / N = ${fmt(r_total)} / ${n} = <span class="highlight">${fmt(r_cada)} Ω por pilha</span>`);
+  steps += answer('r TOTAL', fmt(r_total) + ' Ω');
+  steps += answer('r CADA PILHA', fmt(r_cada) + ' Ω');
+  showResult('res-pilha', steps);
+}
+function clearPilha() {
+  ['pi_n','pi_vnominal','pi_vlamp','pi_i'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('res-pilha').classList.remove('show');
+}
+
+// ============ SÉRIE ============
+function calcSerie() {
+  let r1 = parseFloat(document.getElementById('ser_r1').value);
+  let r2 = parseFloat(document.getElementById('ser_r2').value);
+  let r3 = parseFloat(document.getElementById('ser_r3').value);
+  let V = parseFloat(document.getElementById('ser_v').value);
+  if (isNaN(r1)||isNaN(r2)) { showResult('res-serie','<div class="step-content" style="color:var(--wrong)">⚠ Preencha R1 e R2!</div>'); return; }
+  let Req = r1 + r2 + (isNaN(r3)?0:r3);
+  let steps = `<div class="result-title">🔗 RESOLUÇÃO — SÉRIE</div>`;
+  steps += step(1, `<span class="formula-inline">R_eq = R1 + R2${!isNaN(r3)?' + R3':''}</span>`);
+  steps += step(2, `R_eq = ${r1} + ${r2}${!isNaN(r3)?` + ${r3}`:''} = <span class="highlight">${fmt(Req)} Ω</span>`);
+  if (!isNaN(V)) {
+    const I = V / Req;
+    steps += step(3, `Corrente: I = V / R_eq = ${V} / ${fmt(Req)} = <span class="highlight">${fmt(I)} A</span>`);
+    steps += step(4, `V_R1 = R1 × I = ${r1} × ${fmt(I)} = <span class="highlight">${fmt(r1*I)} V</span>`);
+    steps += step(5, `V_R2 = R2 × I = ${r2} × ${fmt(I)} = <span class="highlight">${fmt(r2*I)} V</span>`);
+    if (!isNaN(r3)) steps += step(6, `V_R3 = R3 × I = ${r3} × ${fmt(I)} = <span class="highlight">${fmt(r3*I)} V</span>`);
+    steps += answer('R_eq', fmt(Req)+' Ω') + answer('CORRENTE', fmt(I)+' A');
+    steps += rec('DISJUNTOR / CABO', recDim(I));
+  } else {
+    steps += answer('R_eq', fmt(Req)+' Ω');
+  }
+  showResult('res-serie', steps);
+}
+function clearSerie() {
+  ['ser_r1','ser_r2','ser_r3','ser_v'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('res-serie').classList.remove('show');
+}
+
+// ============ PARALELO ============
+function calcParalelo() {
+  let r1 = parseFloat(document.getElementById('par_r1').value);
+  let r2 = parseFloat(document.getElementById('par_r2').value);
+  let r3 = parseFloat(document.getElementById('par_r3').value);
+  let V = parseFloat(document.getElementById('par_v').value);
+  if (isNaN(r1)||isNaN(r2)) { showResult('res-paralelo','<div class="step-content" style="color:var(--wrong)">⚠ Preencha R1 e R2!</div>'); return; }
+  let inv = 1/r1 + 1/r2 + (isNaN(r3)?0:1/r3);
+  let Req = 1/inv;
+  let steps = `<div class="result-title">🔗 RESOLUÇÃO — PARALELO</div>`;
+  steps += step(1, `<span class="formula-inline">1/R_eq = 1/R1 + 1/R2${!isNaN(r3)?' + 1/R3':''}</span>`);
+  steps += step(2, `1/R_eq = 1/${r1} + 1/${r2}${!isNaN(r3)?` + 1/${r3}`:''} = ${fmt(1/r1,4)} + ${fmt(1/r2,4)}${!isNaN(r3)?' + '+fmt(1/r3,4):''} = <span class="highlight">${fmt(inv,4)}</span>`);
+  steps += step(3, `R_eq = 1 / ${fmt(inv,4)} = <span class="highlight">${fmt(Req)} Ω</span>`);
+  if (!isNaN(V)) {
+    const It = V / Req;
+    const I1 = V / r1, I2 = V / r2;
+    steps += step(4, `Corrente total: I_t = V / R_eq = ${V} / ${fmt(Req)} = <span class="highlight">${fmt(It)} A</span>`);
+    steps += step(5, `I_R1 = V / R1 = ${V} / ${r1} = <span class="highlight">${fmt(I1)} A</span>`);
+    steps += step(6, `I_R2 = V / R2 = ${V} / ${r2} = <span class="highlight">${fmt(I2)} A</span>`);
+    if (!isNaN(r3)) steps += step(7, `I_R3 = V / R3 = ${V} / ${r3} = <span class="highlight">${fmt(V/r3)} A</span>`);
+    steps += answer('R_eq', fmt(Req)+' Ω') + answer('I TOTAL', fmt(It)+' A');
+    steps += rec('DISJUNTOR / CABO', recDim(It));
+  } else {
+    steps += answer('R_eq', fmt(Req)+' Ω');
+  }
+  showResult('res-paralelo', steps);
+}
+function clearParalelo() {
+  ['par_r1','par_r2','par_r3','par_v'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('res-paralelo').classList.remove('show');
+}
+
+// ============ DOIS IGUAIS PARALELO ============
+function calcPar2() {
+  let V = parseFloat(document.getElementById('par2_v').value);
+  let I = parseFloat(document.getElementById('par2_i').value);
+  let N = parseFloat(document.getElementById('par2_n').value);
+  if ([V,I,N].some(isNaN)) { showResult('res-par2','<div class="step-content" style="color:var(--wrong)">⚠ Preencha todos os campos!</div>'); return; }
+  const Req = V / I;
+  const Rcada = Req * N;
+  let steps = `<div class="result-title">🔗 RESOLUÇÃO — PARALELO COM RESISTORES IGUAIS</div>`;
+  steps += step(1, `R_eq = V / I_total = ${V} / ${I} = <span class="highlight">${fmt(Req)} Ω</span>`);
+  steps += step(2, `Para ${N} resistores iguais em paralelo: R_eq = R / N`);
+  steps += step(3, `R_cada = R_eq × N = ${fmt(Req)} × ${N} = <span class="highlight">${fmt(Rcada)} Ω</span>`);
+  steps += answer('R_eq', fmt(Req)+' Ω') + answer('CADA R', fmt(Rcada)+' Ω');
+  steps += rec('DISJUNTOR / CABO', recDim(I));
+  showResult('res-par2', steps);
+}
+function clearPar2() {
+  ['par2_v','par2_i','par2_n'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('res-par2').classList.remove('show');
+}
+
+// ============ R DESCONHECIDO PARALELO ============
+function calcRx() {
+  let R1 = parseFloat(document.getElementById('rx_r1').value);
+  let I1 = parseFloat(document.getElementById('rx_i1').value);
+  let It = parseFloat(document.getElementById('rx_it').value);
+  if ([R1,I1,It].some(isNaN)) { showResult('res-rx','<div class="step-content" style="color:var(--wrong)">⚠ Preencha todos os campos!</div>'); return; }
+  const V = R1 * I1;
+  const I2 = It - I1;
+  const R2 = V / I2;
+  let steps = `<div class="result-title">🔍 RESOLUÇÃO — R DESCONHECIDO EM PARALELO</div>`;
+  steps += step(1, `Tensão nos terminais: V = R1 × I1 = ${R1} × ${I1} = <span class="highlight">${fmt(V)} V</span>`);
+  steps += step(2, `Em paralelo, mesma tensão para todos!`);
+  steps += step(3, `Corrente em R2: I2 = I_total − I1 = ${It} − ${I1} = <span class="highlight">${fmt(I2)} A</span>`);
+  steps += step(4, `R2 = V / I2 = ${fmt(V)} / ${fmt(I2)} = <span class="highlight">${fmt(R2)} Ω</span>`);
+  steps += answer('R2 DESCONHECIDO', fmt(R2)+' Ω');
+  showResult('res-rx', steps);
+}
+function clearRx() {
+  ['rx_r1','rx_i1','rx_it'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('res-rx').classList.remove('show');
+}
+
+// ============ DIMENSIONAMENTO ============
+function recDim(I) {
+  const Ip = I * 1.25;
+  let disj = '', cabo = '', tipo = '';
+  if (Ip <= 10)       { disj='10 A — Curva C'; cabo='1,5 mm²'; tipo='Iluminação / Tomada simples'; }
+  else if (Ip <= 16)  { disj='16 A — Curva C'; cabo='1,5 mm²'; tipo='Tomadas 10 A'; }
+  else if (Ip <= 20)  { disj='20 A — Curva C'; cabo='2,5 mm²'; tipo='Tomadas 20 A / Ar-cond. até 9000 BTU'; }
+  else if (Ip <= 25)  { disj='25 A — Curva C'; cabo='4,0 mm²'; tipo='Chuveiro / Ar-cond. 12.000 BTU'; }
+  else if (Ip <= 32)  { disj='32 A — Curva C'; cabo='6,0 mm²'; tipo='Chuveiro 7500W / Forno'; }
+  else if (Ip <= 40)  { disj='40 A — Curva C'; cabo='10 mm²'; tipo='Motores até 5 CV / Quadros'; }
+  else if (Ip <= 50)  { disj='50 A — Curva C'; cabo='16 mm²'; tipo='Motores 5–7,5 CV'; }
+  else if (Ip <= 63)  { disj='63 A — Curva D'; cabo='25 mm²'; tipo='Motores 7,5–10 CV / Sub-painéis'; }
+  else                { disj='≥ 70 A — Curva D'; cabo='35 mm² ou maior'; tipo='Entrada geral / Motores grandes'; }
+  return `I projeto = I × 1,25 = ${fmt(I,2)} × 1,25 = <strong>${fmt(Ip,2)} A</strong><br>
+  🔲 Disjuntor: <strong>${disj}</strong><br>
+  🔌 Cabo: <strong>Fio ${cabo} (cobre)</strong><br>
+  📋 Uso típico: ${tipo}`;
+}
+
+function calcDim() {
+  const P = parseFloat(document.getElementById('dim_p').value);
+  const V = parseFloat(document.getElementById('dim_v').value);
+  const fp = parseFloat(document.getElementById('dim_fp').value);
+  const tipo = document.getElementById('dim_tipo').value;
+  if (isNaN(P)||isNaN(V)||isNaN(fp)) { showResult('res-dim','<div class="step-content" style="color:var(--wrong)">⚠ Preencha todos os campos!</div>'); return; }
+  const I = P / (V * fp);
+  const Ip = I * 1.25;
+  let steps = `<div class="result-title">📐 RESOLUÇÃO — DIMENSIONAMENTO NBR 5410</div>`;
+  steps += step(1, `<span class="formula-inline">I = P / (V × fp)</span>`);
+  steps += step(2, `I = ${P} / (${V} × ${fp}) = ${P} / ${V*fp} = <span class="highlight">${fmt(I,3)} A</span>`);
+  steps += step(3, `Fator de segurança NBR 5410: I_proj = I × 1,25`);
+  steps += step(4, `I_proj = ${fmt(I,3)} × 1,25 = <span class="highlight">${fmt(Ip,3)} A</span>`);
+  
+  let disjuntor = '', cabo = '';
+  if (Ip <= 10)      { disjuntor='10 A — Curva C'; cabo='1,5 mm²'; }
+  else if (Ip <= 16) { disjuntor='16 A — Curva C'; cabo='1,5 mm²'; }
+  else if (Ip <= 20) { disjuntor='20 A — Curva C'; cabo='2,5 mm²'; }
+  else if (Ip <= 25) { disjuntor='25 A — Curva C'; cabo='4,0 mm²'; }
+  else if (Ip <= 32) { disjuntor='32 A — Curva C'; cabo='6,0 mm²'; }
+  else if (Ip <= 40) { disjuntor='40 A — Curva C'; cabo='10 mm²'; }
+  else if (Ip <= 50) { disjuntor='50 A — Curva C'; cabo='16 mm²'; }
+  else if (Ip <= 63) { disjuntor='63 A — Curva D'; cabo='25 mm²'; }
+  else               { disjuntor='≥ 70 A — Curva D'; cabo='35 mm² ou maior'; }
+
+  steps += `<div class="dim-result">
+    <div class="dim-item"><div class="dim-label">Corrente carga</div><div class="dim-value">${fmt(I,2)}</div><div class="dim-unit">Ampères</div></div>
+    <div class="dim-item"><div class="dim-label">Corrente projeto</div><div class="dim-value">${fmt(Ip,2)}</div><div class="dim-unit">A (×1,25)</div></div>
+    <div class="dim-item"><div class="dim-label">Disjuntor</div><div class="dim-value" style="font-size:13px">${disjuntor}</div><div class="dim-unit">Proteção</div></div>
+    <div class="dim-item"><div class="dim-label">Cabo</div><div class="dim-value" style="font-size:13px">${cabo}</div><div class="dim-unit">Condutor cobre</div></div>
+  </div>`;
+
+  if (tipo === 'motor') {
+    steps += rec('⚙️ MOTOR — RECOMENDAÇÃO',
+      `Para carga motora com fp típico de 0,8–0,9:<br>
+      ✔ Disjuntor Curva D (pico de partida alto)<br>
+      ✔ Use partida direta para ≤ 5 CV ou soft-starter/inversor para maiores<br>
+      ✔ Motor trifásico de indução é recomendado para cargas acima de 3 CV`);
+  }
+  showResult('res-dim', steps);
+}
+function clearDim() {
+  document.getElementById('dim_p').value = '';
+  document.getElementById('res-dim').classList.remove('show');
+}
+
+// ============ MOTOR ELÉTRICO ============
+function calcMotor() {
+  let P = parseFloat(document.getElementById('mot_p').value);
+  const unit = document.getElementById('mot_unit').value;
+  const feed = document.getElementById('mot_feed').value;
+  const app = document.getElementById('mot_app').value;
+  if (isNaN(P)) { showResult('res-motor','<div class="step-content" style="color:var(--wrong)">⚠ Preencha a potência!</div>'); return; }
+
+  let Pw = P;
+  let unitLabel = 'W';
+  if (unit === 'cv') { Pw = P * 735.5; unitLabel = 'CV'; }
+  else if (unit === 'kw') { Pw = P * 1000; unitLabel = 'kW'; }
+  const Pcv = Pw / 735.5;
+  const PkW = Pw / 1000;
+
+  let tipo = '', partida = '', disjCurva = 'D', fp = 0.85;
+  let vAlim = feed.includes('380') ? 380 : 220;
+
+  if (Pcv <= 0.5) {
+    tipo = '⚡ Motor Monofásico de Indução (capacitor) ou Universal';
+    partida = 'Partida direta (chave simples)';
+  } else if (Pcv <= 3 && feed === 'mono220') {
+    tipo = '⚡ Motor Monofásico de Indução com capacitor de partida';
+    partida = 'Partida direta ou chave capacitora';
+  } else if (Pcv <= 5) {
+    tipo = '⚙️ Motor Trifásico de Indução (MIT) — Gaiola de Esquilo';
+    partida = 'Partida direta (até 5 CV) ou estrela-triângulo';
+  } else if (Pcv <= 20) {
+    tipo = '⚙️ Motor Trifásico de Indução (MIT) — Gaiola de Esquilo';
+    partida = 'Estrela-triângulo (Y-Δ) ou Soft-Starter';
+  } else {
+    tipo = '⚙️ Motor Trifásico de Indução (MIT) de Alta Eficiência (IE3/IE4)';
+    partida = 'Inversor de Frequência (VFD) recomendado';
+  }
+
+  const I = Pw / (vAlim * fp * (feed.startsWith('tri') ? Math.sqrt(3) : 1));
+  const Ip = I * 1.25;
+
+  let steps = `<div class="result-title">⚙️ DIMENSIONAMENTO DE MOTOR ELÉTRICO</div>`;
+  steps += step(1, `Converter potência: ${P} ${unitLabel} = <span class="highlight">${fmt(Pcv,2)} CV = ${fmt(PkW,2)} kW</span>`);
+  steps += step(2, `Alimentação: <span class="highlight">${feed.startsWith('tri') ? 'Trifásico' : 'Monofásico'} ${vAlim} V</span>`);
+  steps += step(3, `Corrente aproximada: I = P / (V × fp${feed.startsWith('tri')?'×√3':''}) = ${fmt(Pw)} / (${vAlim} × ${fp}${feed.startsWith('tri')?'×1,73':''}) = <span class="highlight">${fmt(I,2)} A</span>`);
+  steps += step(4, `I projeto (×1,25) = <span class="highlight">${fmt(Ip,2)} A</span>`);
+  steps += `<div class="dim-result">
+    <div class="dim-item"><div class="dim-label">Potência</div><div class="dim-value">${fmt(Pcv,2)}</div><div class="dim-unit">CV</div></div>
+    <div class="dim-item"><div class="dim-label">Corrente</div><div class="dim-value">${fmt(I,2)}</div><div class="dim-unit">A (aprox.)</div></div>
+  </div>`;
+  steps += rec('⚙️ MOTOR RECOMENDADO',
+    `Tipo: <strong>${tipo}</strong><br>
+    Partida: <strong>${partida}</strong><br>
+    Disjuntor: <strong>Curva D</strong> (pico de partida de motores)<br>
+    Cabo: baseado em I_proj = ${fmt(Ip,2)} A → ${recCabo(Ip)}<br><br>
+    📌 Aplicação (${app}): ${appRec(app, Pcv)}`);
+  showResult('res-motor', steps);
+}
+
+function recCabo(Ip) {
+  if (Ip <= 16) return '1,5 mm²';
+  if (Ip <= 20) return '2,5 mm²';
+  if (Ip <= 25) return '4,0 mm²';
+  if (Ip <= 32) return '6,0 mm²';
+  if (Ip <= 40) return '10 mm²';
+  if (Ip <= 50) return '16 mm²';
+  if (Ip <= 63) return '25 mm²';
+  return '35 mm² ou maior';
+}
+
+function appRec(app, cv) {
+  const map = {
+    bomba: `Bomba/Compressor: prefira motor MIT trifásico para > 1 CV. Use VFD para economia de energia e proteção contra cavitação.`,
+    esteira: `Esteira: MIT com caixa de redução ou motor de torque elevado (curva de conjugado plana). VFD ideal para velocidade variável.`,
+    ventilador: `Ventilador/Exaustor: MIT é ideal. VFD reduz consumo em até 50% com controle de rotação. Curva de conjugado quadrática.`,
+    geral: `Uso geral: Motor MIT padrão IE2/IE3. Verifique conjugado de partida e condições de instalação (IP, temperatura ambiente).`
+  };
+  return map[app] || '';
+}
+
+function clearMotor() {
+  document.getElementById('mot_p').value = '';
+  document.getElementById('res-motor').classList.remove('show');
+}
+
+// ============ QUIZ ============
+const correctAnswers = {
+  q1:'d', q2:'a', q3:'c', q4:'b', q5:'b',
+  q6:'d', q7:'d', q8:'d', q9:'d', q10:'c'
+};
+
+function checkQ(qid, chosen) {
+  const correct = correctAnswers[qid];
+  const expEl = document.getElementById('exp-' + qid);
+  const btns = expEl.closest('.quiz-question').querySelectorAll('.option-btn');
+  btns.forEach(btn => {
+    const letter = btn.textContent.trim()[0].toLowerCase();
+    btn.classList.remove('correct','wrong');
+    btn.disabled = true;
+    if (letter === correct) btn.classList.add('correct');
+    else if (letter === chosen) btn.classList.add('wrong');
+  });
+  expEl.classList.add('show');
+}
+
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
+</script>
+</body>
+</html>
